@@ -5,7 +5,7 @@
 
       <!-- 登录表单开始 -->
       <el-tabs v-model="activeName" @tab-click="handleClick" class="tabs">
-        <el-tab-pane label="学生登录" name="first">
+        <el-tab-pane label="学生" name="first">
           <el-form
             :model="loginFrom"
             :rules="LoginRules"
@@ -30,38 +30,38 @@
             <el-form-item class="btns">
               <el-button type="primary" @click="login">登录</el-button>
               <el-button type="info" @click="resetLoginForm">重置</el-button>
-              <span @click="addDialogVisible = true">没有账号? 点击马上注册</span>
+              <span @click="addDialogOpen">没有账号? 点击马上注册</span>
             </el-form-item>
           </el-form>
         </el-tab-pane>
 
-        <el-tab-pane label="教师登录" name="second">教师登录</el-tab-pane>
-        <el-tab-pane label="管理员登录" name="thired">管理员登录</el-tab-pane>
+        <el-tab-pane label="教师" name="second">教师登录</el-tab-pane>
+        <el-tab-pane label="管理员" name="thired">管理员登录</el-tab-pane>
       </el-tabs>
       <!--表单结束  -->
     </div>
 
     <!-- 注册对话框 -->
-    <el-dialog title="学生注册" :visible.sync="addDialogVisible" width="30%" @close="addDialogClosed">
+    <el-dialog title="学生注册" :visible.sync="addDialogVisible" width="40%" @close="addDialogClosed">
       <!-- 主体部分 -->
       <el-form
         :model="addForm"
         status-icon
         :rules="addFormRules"
         ref="addFormRef"
-        label-width="100px"
+        label-width="70px"
       >
         <el-form-item label="姓名" prop="name">
-          <el-input v-model="addForm.name"></el-input>
+          <el-input v-model="addForm.name" clearable></el-input>
         </el-form-item>
         <el-form-item label="用户名" prop="username">
-          <el-input v-model="addForm.username"></el-input>
+          <el-input v-model="addForm.username" clearable></el-input>
         </el-form-item>
         <el-form-item label="密码" prop="password">
-          <el-input type="password" v-model="addForm.password"></el-input>
+          <el-input type="password" v-model="addForm.password" clearable></el-input>
         </el-form-item>
         <el-form-item label="确认密码" prop="checkPass">
-          <el-input type="password" v-model="addForm.checkPass" auto-complete="off"></el-input>
+          <el-input type="password" v-model="addForm.checkPass" auto-complete="off" clearable></el-input>
         </el-form-item>
         <el-form-item label="性别" prop="sex">
           <el-radio-group v-model="addForm.sex">
@@ -70,12 +70,17 @@
           </el-radio-group>
         </el-form-item>
         <el-form-item label="学院" prop="college">
-          <el-autocomplete
+          <el-select
             v-model="addForm.college"
-            :fetch-suggestions="querySearchAsync"
-            placeholder="学院"
-            @select="handleSelect"
-          ></el-autocomplete>
+            filterable
+            remote
+            reserve-keyword
+            placeholder="请输入学院"
+            :remote-method="remoteMethod"
+            :loading="loading"
+          >
+            <el-option v-for="item in options" :key="item.id" :label="item.name" :value="item.id"></el-option>
+          </el-select>
         </el-form-item>
       </el-form>
 
@@ -91,14 +96,39 @@
 <script>
 export default {
   data() {
-    //表单自定义验证
-    var validatePass = (rule, value, callback) => {
-      if (value === "") {
-        callback(new Error("请输入密码"));
-      } else {
-        if (this.loginFrom.checkPass !== "") {
-          this.$refs.LoginFormRef.validateField("checkPass");
+    //自定义验证 用户名是否在数据库中存在
+    var validateUsername = (rule, value, callback) => {
+      if (!value) {
+        return callback(new Error("用户名不能为空"));
+      }
+      this.validateStudent(value).then(res => {
+        //console.log(res)
+        if (res.code == 200) {
+          if (res.data == 1) {
+            callback(new Error("该用户名已经存在"));
+          } else {
+            callback();
+          }
+        } else {
+          //接口出现异常
+          callback(new Error("接口出现异常"));
         }
+      });
+    };
+
+    //自定义验证 确认密码
+    var validatePass = (rule, value, callback) => {
+      if (this.addForm.checkPass !== "") {
+        this.$refs.LoginFormRef.validateField("checkPass");
+      }
+      callback();
+    };
+    var validatePass2 = (rule, value, callback) => {
+      if (value === "") {
+        callback(new Error("请再次输入密码"));
+      } else if (value !== this.addForm.password) {
+        callback(new Error("两次输入密码不一致!"));
+      } else {
         callback();
       }
     };
@@ -116,8 +146,7 @@ export default {
           { required: true, message: "请输入账号", trigger: "blur" },
           { min: 2, max: 10, message: "长度在 2 到 10 个字符", trigger: "blur" }
         ],
-        password: [
-          { required: true, message: "请输入密码", trigger: "blur" }]
+        password: [{ required: true, message: "请输入密码", trigger: "blur" }]
       },
 
       //学生注册对话框的 显示与隐藏
@@ -134,10 +163,15 @@ export default {
         level: "",
         classes: ""
       },
+
+      options: [],
+      loading: false,
       //学校学院
       colleges: [],
+
       //添加表单的验证规则对象
       addFormRules: {
+        name: [{ required: true, message: "请输入姓名", trigger: "blur" }],
         username: [
           { required: true, message: "请输入用户名", trigger: "blur" },
           {
@@ -145,21 +179,21 @@ export default {
             max: 10,
             message: "用户名长度在3~10个字符之间",
             trigger: "blur"
-          }
+          },
+          { validator: validateUsername, trigger: "blur" }
         ],
         password: [
           { required: true, message: "请输入密码", trigger: "blur" },
+          { validator: validatePass, trigger: "blur" },
           {
             min: 6,
             max: 15,
             message: "密码长度在6~15个字符之间",
             trigger: "blur"
           }
-        ]
-      },
-
-      //注册方法
-      addUser() {}
+        ],
+        checkPass: [{ validator: validatePass2, trigger: "blur" }]
+      }
     };
   },
   methods: {
@@ -171,50 +205,67 @@ export default {
       this.$refs.LoginFormRef.resetFields();
     },
     login() {
-      console.log(1)
+      console.log(1);
       //1.先做表单的预验证
       this.$refs.LoginFormRef.validate(async valid => {
-       
-        if(!valid) return; //预验证失败
-        const {data: res} = await this.$http.post("student/login",this.loginFrom);
-        console.log(res)
-         if (res.code !== 200) return this.$message.error("登录失败! "+res.msg);
-         this.$message.success(res.msg);
-         window.sessionStorage.setItem("token",res.data);
-      })
-
+        if (!valid) return; //预验证失败
+        const { data: res } = await this.$http.post(
+          "student/login",
+          this.loginFrom
+        );
+        console.log(res);
+        if (res.code !== 200)
+          return this.$message.error("登录失败! " + res.msg);
+        this.$message.success(res.msg);
+        window.sessionStorage.setItem("token", res.data);
+      });
     },
 
+    //学生注册对话框打开
+    addDialogOpen() {
+      this.addDialogVisible = true;
+      this.loadAllCollege();
+    },
     //学生注册对话框关闭事件
     addDialogClosed() {
       //对话框关闭时，表单重置
       this.$refs.addFormRef.resetFields();
     },
 
-    //学生注册是显示学院
-    querySearchAsync(queryString, cb) {
-      var restaurants = this.restaurants;
-      var results = queryString
-        ? restaurants.filter(this.createStateFilter(queryString))
-        : restaurants;
+    //去数据库查询是否存在用户名
+    async validateStudent(username) {
+      const { data: res } = await this.$http.get("/registered/" + username);
+      return res;
+    },
 
-      clearTimeout(this.timeout);
-      this.timeout = setTimeout(() => {
-        cb(results);
-      }, 3000 * Math.random());
+    //加载所有学院
+    async loadAllCollege() {
+      const { data: res } = await this.$http.get("/loadAllCollege");
+      if (res.code == 200) {
+        this.colleges = res.data;
+      }
     },
-    createStateFilter(queryString) {
-      return state => {
-        return (
-          state.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0
-        );
-      };
+
+    //select选择框 处理选择学院
+    remoteMethod(query) {
+      if (query !== "") {
+        this.loading = true;
+        setTimeout(() => {
+          this.loading = false;
+
+          this.options = this.colleges.filter(item => {
+            return item.name.toLowerCase().indexOf(query.toLowerCase()) > -1;
+          });
+        }, 200);
+      } else {
+        this.options = [];
+      }
     },
-    //学院显示出来
-    handleSelect(item) {
-      console.log(item);
+    addUser() {
+      console.log(this.addForm);
     }
-  }
+  },
+  mounted() {}
 };
 </script>
 
