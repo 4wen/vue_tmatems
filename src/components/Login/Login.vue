@@ -78,8 +78,24 @@
             placeholder="请输入学院"
             :remote-method="remoteMethod"
             :loading="loading"
+            @change="initClassesOptions"
           >
-            <el-option v-for="item in options" :key="item.id" :label="item.name" :value="item.id"></el-option>
+            <el-option
+              v-for="item in CollegesOptions"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="年级" prop="classes">
+          <el-select v-model="addForm.classes" placeholder="请选择年级">
+            <el-option
+              v-for="item in ClassesOptions"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
+            ></el-option>
           </el-select>
         </el-form-item>
       </el-form>
@@ -160,12 +176,16 @@ export default {
         checkPass: "",
         sex: "",
         college: "",
-        level: "",
         classes: ""
       },
 
-      options: [],
+      //待选择的学院
+      CollegesOptions: [],
+      //待选择的班级
+      ClassesOptions: [],
+
       loading: false,
+
       //学校学院
       colleges: [],
 
@@ -192,7 +212,9 @@ export default {
             trigger: "blur"
           }
         ],
-        checkPass: [{ validator: validatePass2, trigger: "blur" }]
+        checkPass: [{ validator: validatePass2, trigger: "blur" }],
+        sex: [{ required: true, message: "请选择性别", trigger: "blur" }],
+        college: [{ required: true, message: "请输入学院", trigger: "blur" }]
       }
     };
   },
@@ -245,24 +267,42 @@ export default {
         this.colleges = res.data;
       }
     },
+    //根据学院加载班级
+    async loadAllClasses(id) {
+      const { data: res } = await this.$http.get("/loadAllClasses/" + id);
+      if (res.code == 200) {
+        this.ClassesOptions = res.data;
+      }
+    },
 
+    initClassesOptions(id) {
+      console.log("123");
+      this.loadAllClasses(id);
+    },
     //select选择框 处理选择学院
     remoteMethod(query) {
       if (query !== "") {
         this.loading = true;
         setTimeout(() => {
           this.loading = false;
-
-          this.options = this.colleges.filter(item => {
+          this.CollegesOptions = this.colleges.filter(item => {
             return item.name.toLowerCase().indexOf(query.toLowerCase()) > -1;
           });
-        }, 200);
+        }, 100);
+        console.log("ok");
+        console.log(this.addForm.college);
       } else {
-        this.options = [];
+        this.CollegesOptions = [];
       }
     },
-    addUser() {
-      console.log(this.addForm);
+    async addUser() {
+      const { data: res } = await this.$http.post("/registered/", this.addForm);
+      if (res.code == 200) {
+        this.$message.success(res.msg);
+        this.addDialogVisible = false;
+      }else {
+        this.$message.error(res.msg)
+      }
     }
   },
   mounted() {}
