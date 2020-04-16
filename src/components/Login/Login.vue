@@ -35,8 +35,12 @@
           </el-form>
         </el-tab-pane>
 
-        <el-tab-pane label="教师" name="second">教师登录</el-tab-pane>
-        <el-tab-pane label="管理员" name="thired">管理员登录</el-tab-pane>
+        <el-tab-pane label="教师" name="second">
+          <teacherLogin></teacherLogin>
+        </el-tab-pane>
+        <el-tab-pane label="管理员" name="thired">
+          <adminLogin></adminLogin>
+        </el-tab-pane>
       </el-tabs>
       <!--表单结束  -->
     </div>
@@ -110,6 +114,9 @@
 </template>
 
 <script>
+import teacherLogin from "./TeacherLogin.vue";
+import AdminLogin from "./AdminLogin.vue";
+import jwt_decode from "jwt-decode";
 export default {
   data() {
     //自定义验证 用户名是否在数据库中存在
@@ -160,7 +167,7 @@ export default {
       LoginRules: {
         username: [
           { required: true, message: "请输入账号", trigger: "blur" },
-          { min: 2, max: 10, message: "长度在 2 到 10 个字符", trigger: "blur" }
+          { min: 2, max: 10, message: "长度在 4 到 10 个字符", trigger: "blur" }
         ],
         password: [{ required: true, message: "请输入密码", trigger: "blur" }]
       },
@@ -191,14 +198,24 @@ export default {
 
       //添加表单的验证规则对象
       addFormRules: {
-        name: [{ required: true, message: "请输入姓名", trigger: "blur" }],
+        name: [
+          { required: true, message: "请输入姓名", trigger: "blur" },
+          {
+            pattern: /^[\u4E00-\u9FA5]+$/,
+            message: "姓名只能为中文"
+          }
+        ],
         username: [
           { required: true, message: "请输入用户名", trigger: "blur" },
           {
             min: 3,
             max: 10,
-            message: "用户名长度在3~10个字符之间",
+            message: "用户名长度在4~10个字符之间",
             trigger: "blur"
+          },
+          {
+            pattern: /[0-9a-zA-Z]{4,10}/,
+            message: "用户名必须是由4-10位数字和字母组合"
           },
           { validator: validateUsername, trigger: "blur" }
         ],
@@ -206,10 +223,8 @@ export default {
           { required: true, message: "请输入密码", trigger: "blur" },
           { validator: validatePass, trigger: "blur" },
           {
-            min: 6,
-            max: 15,
-            message: "密码长度在6~15个字符之间",
-            trigger: "blur"
+            pattern: /^(\w){6,20}$/,
+            message: "只能输入6-20个字母、数字、下划线的组合"
           }
         ],
         checkPass: [{ validator: validatePass2, trigger: "blur" }],
@@ -220,14 +235,15 @@ export default {
   },
   methods: {
     //选项卡切换
-    handleClick(tab, event) {},
+    handleClick(tab, event) {
+      //console.log(tab,event)
+    },
 
     //重置表单
     resetLoginForm() {
       this.$refs.LoginFormRef.resetFields();
     },
     login() {
-      console.log(1);
       //1.先做表单的预验证
       this.$refs.LoginFormRef.validate(async valid => {
         if (!valid) return; //预验证失败
@@ -238,8 +254,12 @@ export default {
         console.log(res);
         if (res.code !== 200)
           return this.$message.error("登录失败! " + res.msg);
-        this.$message.success(res.msg);
+        //登录成功 token存入sessionStorage
         window.sessionStorage.setItem("token", res.data);
+        //college存入vuex
+        const decode = jwt_decode(res.data);
+        this.$store.commit("getUserCollegeId",decode.student.college)
+        this.$message.success(res.msg);
       });
     },
 
@@ -300,10 +320,14 @@ export default {
       if (res.code == 200) {
         this.$message.success(res.msg);
         this.addDialogVisible = false;
-      }else {
-        this.$message.error(res.msg)
+      } else {
+        this.$message.error(res.msg);
       }
     }
+  },
+  components: {
+    teacherLogin,
+    AdminLogin
   },
   mounted() {}
 };
