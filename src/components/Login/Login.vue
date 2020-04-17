@@ -30,7 +30,7 @@
             <el-form-item class="btns">
               <el-button type="primary" @click="login">登录</el-button>
               <el-button type="info" @click="resetLoginForm">重置</el-button>
-              <span @click="addDialogOpen">没有账号? 点击马上注册</span>
+              <span @click="addDialogOpen"><el-link type="primary">没有账号? 点击马上注册</el-link></span>
             </el-form-item>
           </el-form>
         </el-tab-pane>
@@ -251,15 +251,25 @@ export default {
           "student/login",
           this.loginFrom
         );
-        console.log(res);
+        
         if (res.code !== 200)
           return this.$message.error("登录失败! " + res.msg);
+        //先清空  
+        window.sessionStorage.clear();  
         //登录成功 token存入sessionStorage
         window.sessionStorage.setItem("token", res.data);
+
         //college存入vuex
         const decode = jwt_decode(res.data);
         this.$store.commit("getUserCollegeId",decode.student.college)
         this.$message.success(res.msg);
+
+        //用户类型存入sessionStorage
+        window.sessionStorage.setItem("role",decode.role)
+
+        // 通过编程式导航跳转到后台主页，路由地址是 /home
+        this.$router.push("/home");
+        
       });
     },
 
@@ -295,10 +305,11 @@ export default {
       }
     },
 
+    //初始化班级选择框
     initClassesOptions(id) {
-      console.log("123");
       this.loadAllClasses(id);
     },
+
     //select选择框 处理选择学院
     remoteMethod(query) {
       if (query !== "") {
@@ -309,8 +320,6 @@ export default {
             return item.name.toLowerCase().indexOf(query.toLowerCase()) > -1;
           });
         }, 100);
-        console.log("ok");
-        console.log(this.addForm.college);
       } else {
         this.CollegesOptions = [];
       }

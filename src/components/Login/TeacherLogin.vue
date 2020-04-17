@@ -56,7 +56,7 @@ export default {
       this.$refs.LoginFormRef.resetFields();
     },
     login() {
-      console.log(1);
+
       //1.先做表单的预验证
       this.$refs.LoginFormRef.validate(async valid => {
         if (!valid) return; //预验证失败
@@ -64,14 +64,20 @@ export default {
           "teacher/login",
           this.loginFrom
         );
-        console.log(res);
+
         if (res.code !== 200)
           return this.$message.error("登录失败! " + res.msg);
+        
+        //先清空  
+        window.sessionStorage.clear();  
         //登录成功 token存入sessionStorage
         window.sessionStorage.setItem("token", res.data);
         //college存入vuex
         const decode = jwt_decode(res.data);
         this.$store.commit("getUserCollegeId",decode.teacher.college)
+        //用户类型存入sessionStorage
+        window.sessionStorage.setItem("role",decode.role)
+
         this.$message.success(res.msg);
       });
     },

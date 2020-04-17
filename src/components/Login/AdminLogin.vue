@@ -65,15 +65,21 @@ export default {
           "admin/login",
           this.loginFrom
         );
-        console.log(res);
+
         //登录失败返回
         if (res.code !== 200)
           return this.$message.error("登录失败! " + res.msg);
+
+        //先清空sessionStorage
+        window.sessionStorage.clear();
         //登录成功 token存入sessionStorage
         window.sessionStorage.setItem("token", res.data);
         //college存入vuex
         const decode = jwt_decode(res.data);
-        this.$store.commit("getUserCollegeId",decode.admin.college)
+        this.$store.commit("getUserCollegeId", decode.admin.college);
+        //用户类型存入sessionStorage
+        window.sessionStorage.setItem("role", decode.role);
+
         this.$message.success(res.msg);
       });
     }
