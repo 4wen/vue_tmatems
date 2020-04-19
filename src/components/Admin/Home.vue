@@ -328,7 +328,6 @@ export default {
 
     //退出方法
     logout() {
-
       window.sessionStorage.clear();
       this.$router.push("/login");
     },
