@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <!-- 登录 路由占位符 -->
+    <!-- 路由占位符 -->
     <router-view></router-view>
   </div>
 </template>

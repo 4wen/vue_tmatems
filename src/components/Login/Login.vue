@@ -257,15 +257,16 @@ export default {
         //先清空  
         window.sessionStorage.clear();  
         //登录成功 token存入sessionStorage
-        window.sessionStorage.setItem("token", res.data);
+        window.sessionStorage.setItem("token", "Bearer "+res.data);
 
         //college存入vuex
         const decode = jwt_decode(res.data);
         this.$store.commit("getUserCollegeId",decode.student.college)
         this.$message.success(res.msg);
 
-        //用户类型存入sessionStorage
+        //用户类型和名字存入sessionStorage
         window.sessionStorage.setItem("role",decode.role)
+        window.sessionStorage.getItem("name",decode.student.name)
 
         // 通过编程式导航跳转到后台主页，路由地址是 /home
         this.$router.push("/home");
@@ -324,6 +325,7 @@ export default {
         this.CollegesOptions = [];
       }
     },
+    //注册学生
     async addUser() {
       const { data: res } = await this.$http.post("/registered/", this.addForm);
       if (res.code == 200) {

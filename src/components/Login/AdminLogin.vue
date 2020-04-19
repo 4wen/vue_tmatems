@@ -73,14 +73,17 @@ export default {
         //先清空sessionStorage
         window.sessionStorage.clear();
         //登录成功 token存入sessionStorage
-        window.sessionStorage.setItem("token", res.data);
+        window.sessionStorage.setItem("token", "Bearer "+res.data);
         //college存入vuex
         const decode = jwt_decode(res.data);
-        this.$store.commit("getUserCollegeId", decode.admin.college);
-        //用户类型存入sessionStorage
+        this.$store.commit("getUser", decode.admin);
+        //用户类型和名字存入sessionStorage
         window.sessionStorage.setItem("role", decode.role);
+        window.sessionStorage.setItem("name",decode.admin.name);
 
         this.$message.success(res.msg);
+        // 通过编程式导航跳转到后台主页，路由地址是 /home
+        this.$router.push("/home");
       });
     }
   }

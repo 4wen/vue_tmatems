@@ -5,11 +5,13 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    college: ""
+    user: {
+
+    }
   },
   mutations: {
-    getUserCollegeId(state,id) {
-      state.college = id; 
+    getUser(state,user) {
+      state.user = user; 
      }
   },
   actions: {
