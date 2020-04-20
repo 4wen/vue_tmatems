@@ -59,13 +59,13 @@
           <el-input v-model="addForm.name" clearable/>
         </el-form-item>
         <el-form-item label="用户名" prop="username">
-          <el-input v-model="addForm.username" clearable></el-input>
+          <el-input v-model="addForm.username" clearable/>
         </el-form-item>
         <el-form-item label="密码" prop="password">
-          <el-input type="password" v-model="addForm.password" clearable></el-input>
+          <el-input type="password" v-model="addForm.password" clearable/>
         </el-form-item>
         <el-form-item label="确认密码" prop="checkPass">
-          <el-input type="password" v-model="addForm.checkPass" auto-complete="off" clearable></el-input>
+          <el-input type="password" v-model="addForm.checkPass" auto-complete="off" clearable/>
         </el-form-item>
         <el-form-item label="性别" prop="sex">
           <el-radio-group v-model="addForm.sex">
@@ -121,7 +121,7 @@
   export default {
     data() {
       //自定义验证 用户名是否在数据库中存在
-      var validateUsername = (rule, value, callback) => {
+      const validateUsername = (rule, value, callback) => {
         if (!value) {
           return callback(new Error("用户名不能为空"));
         }
@@ -141,13 +141,13 @@
       };
 
       //自定义验证 确认密码
-      var validatePass = (rule, value, callback) => {
+      const validatePass = (rule, value, callback) => {
         if (this.addForm.checkPass !== "") {
           this.$refs.LoginFormRef.validateField("checkPass");
         }
         callback();
       };
-      var validatePass2 = (rule, value, callback) => {
+      const validatePass2 = (rule, value, callback) => {
         if (value === "") {
           callback(new Error("请再次输入密码"));
         } else if (value !== this.addForm.password) {
@@ -230,7 +230,8 @@
           ],
           checkPass: [{validator: validatePass2, trigger: "blur"}],
           sex: [{required: true, message: "请选择性别", trigger: "blur"}],
-          college: [{required: true, message: "请输入学院", trigger: "blur"}]
+          college: [{required: true, message: "请选择学院", trigger: "blur"}],
+          classes: [{required: true, message: "请选择班级", trigger: "blur"}]
         }
       };
     },
@@ -295,14 +296,14 @@
       //加载所有学院
       async loadAllCollege() {
         const {data: res} = await this.$http.get("/loadAllCollege");
-        if (res.code == 200) {
+        if (res.code === 200) {
           this.colleges = res.data;
         }
       },
       //根据学院加载班级
       async loadAllClasses(id) {
         const {data: res} = await this.$http.get("/loadAllClasses/" + id);
-        if (res.code == 200) {
+        if (res.code === 200) {
           this.ClassesOptions = res.data;
         }
       },
@@ -329,7 +330,7 @@
       //注册学生
       async addUser() {
         const {data: res} = await this.$http.post("/registered/", this.addForm);
-        if (res.code == 200) {
+        if (res.code === 200) {
           this.$message.success(res.msg);
           this.addDialogVisible = false;
         } else {
@@ -355,9 +356,9 @@
 
   .login_box {
     width: 450px;
-    height: 340px;
+    height: 350px;
     background-color: #fff;
-    border-radius: 5px;
+    border-radius: 15px;
     position: absolute;
     left: 50%;
     top: 50%;
@@ -401,5 +402,13 @@
   .el-tabs__item {
     padding: 0 5px !important;
     font-size: 12px !important;
+  }
+
+  .el-tabs__nav-scroll {
+    padding-left: 30px !important;
+  }
+
+  .el-tabs__nav-wrap::after {
+    background-color: #fff !important;
   }
 </style>

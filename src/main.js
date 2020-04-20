@@ -20,16 +20,14 @@ function startLoading() {
 }
 
 function endLoading() {
-
   setTimeout(() => {
     loading.close();
-  }, 1000);
-
+  }, 500);
 }
 
 //配置axios
 import axios from 'axios'
-axios.defaults.baseURL = 'http://localhost:8090/'
+axios.defaults.baseURL = 'http://localhost:8090/';
 //请求拦截，带上token去请求后台接口
 axios.interceptors.request.use(config => {
   
@@ -41,25 +39,30 @@ axios.interceptors.request.use(config => {
   }
   
   //请求头对象，添加 Authorization 字段
-  config.headers.Authorization = window.sessionStorage.getItem('token')
+  config.headers.Authorization = window.sessionStorage.getItem('token');
   return config
-})
+});
+
 //响应拦截
 axios.interceptors.response.use(response => {
-
+  //console.log(response);
   if (!response.config.url.includes("/registered/")
     && !response.config.url.includes("/loadAllCollege")
     && !response.config.url.includes("/loadAllClasses/")) {
       endLoading();
   }
   //返回码为 401 token无效或者过期 重新登录
-  if (response.data.code == 401) {
+  if (response.data.code === 401) {
     Message.error("token过期，请重新登录");
     router.push('login')
   }
-
   return response
-})
+
+},error => {
+  endLoading();
+  Message.error("服务器响应失败，联系管理员");
+
+});
 
 Vue.prototype.$http = axios //全局挂载axios
 

@@ -65,7 +65,7 @@
       <!-- 右边栏 -->
       <el-main>
         <!-- 这里有一个孤独的路由占位符 -->
-        <router-view></router-view>
+        <router-view/>
 
         <!-- 修改密码对话框 -->
         <el-dialog
@@ -94,6 +94,7 @@
   export default {
     data() {
       return {
+        //超级管理员的菜单
         superAdminMenuList: [
           {
             id: 1,
@@ -206,6 +207,8 @@
             ]
           }
         ],
+
+        //学院管理员的菜单
         adminMenuList: [
           {
             id: 1,
@@ -303,10 +306,12 @@
         activePath: "" //链接高亮 激活状态
       };
     },
+
     created() {
       this.loadMenuListAndAdminName();
       this.activePath = window.sessionStorage.getItem("activePath");
     },
+
     methods: {
       //根据角色加载菜单列表
       loadMenuListAndAdminName() {
@@ -325,6 +330,9 @@
       //退出方法
       logout() {
         window.sessionStorage.clear();
+        setTimeout(()=> {
+
+        },500);
         this.$router.push("/login");
       },
 
