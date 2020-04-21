@@ -18,12 +18,14 @@
                      style="width: 100%"
                      clearable
                      @change="loadClassesOptions"
+                     v-if="showCollegeFlag"
           >
             <el-option
                     v-for="item in CollegesOptions"
                     :key="item.id"
                     :label="item.name"
                     :value="item.id"
+                    :disabled="item.disabled"
             />
           </el-select>
         </el-col>
@@ -179,7 +181,7 @@
 
     created() {
       this.getStudentList();
-      this.loadAllCollege();
+
     },
 
     data() {
@@ -195,6 +197,9 @@
 
         //学生列表
         studentList: [],
+
+        //当前管理员的学院
+        showCollegeFlag: true,
 
         loading: false,
 
@@ -244,7 +249,7 @@
         },
 
         //批量删除的显示与隐藏
-        multipleButtonFlag:false,
+        multipleButtonFlag: false,
 
         //批量删除的id
         multipleSelection: [],
@@ -254,6 +259,17 @@
 
       //获得学生列表
       async getStudentList() {
+        //判断是超级管理员还是学院管理员
+        const college = window.sessionStorage.getItem("college");
+
+        if (parseInt(college) === 0) {
+          this.loadAllCollege();
+        } else {
+          this.showCollegeFlag = false;
+          this.queryInfo.college = college;
+          this.loadAllClasses(college);
+        }
+
         const {data: res} = await this.$http.get("student", {
           params: this.queryInfo
         });
@@ -288,13 +304,17 @@
 
       //根据学院加载班级
       async loadAllClasses(id) {
+        const college = window.sessionStorage.getItem("college");
+        if(parseInt(college)!==0) {
+          id = college;
+        }
         const {data: res} = await this.$http.get("/loadAllClasses/" + id);
         if (res.code === 200) {
           this.ClassesOptions = res.data;
         }
       },
 
-      //加载选择班级框
+      //加载选择班级
       loadClassesOptions(id) {
         console.log(!id);
         if (!id) {
@@ -416,7 +436,7 @@
 
       //批量删除学生
       async multiDelete() {
-        if(this.multipleSelection.length ===0) {
+        if (this.multipleSelection.length === 0) {
           return this.$message.info("请先选择要删除的学生");
         }
         const confirmResult = await this.$confirm(
@@ -442,7 +462,7 @@
           //拿到批量删除的id数组
           params.push(item.id);
         });
-        const {data: res} = await this.$http.put("student/multiDelete" , params);
+        const {data: res} = await this.$http.put("student/multiDelete", params);
 
         if (res.code !== 200) {
           return this.$message.error("删除学生失败！");

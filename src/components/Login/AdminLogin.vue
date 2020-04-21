@@ -80,6 +80,7 @@ export default {
         //用户类型和名字存入sessionStorage
         window.sessionStorage.setItem("role", decode.role);
         window.sessionStorage.setItem("name",decode.admin.name);
+        window.sessionStorage.setItem("college",decode.admin.college);
 
         this.$message.success(res.msg);
         // 通过编程式导航跳转到后台主页，路由地址是 /home
