@@ -46,7 +46,10 @@
     </div>
 
     <!-- 注册对话框 -->
-    <el-dialog title="学生注册" :visible.sync="addDialogVisible" width="40%" @close="addDialogClosed">
+    <el-dialog title="学生注册"
+               :visible.sync="addDialogVisible"
+               width="400px"
+               @close="addDialogClosed">
       <!-- 主体部分 -->
       <el-form
               :model="addForm"
@@ -99,6 +102,7 @@
                     :key="item.id"
                     :label="item.name"
                     :value="item.id"
+                    :disabled="item.disabled"
             />
           </el-select>
         </el-form-item>
@@ -190,7 +194,11 @@
         //待选择的学院
         CollegesOptions: [],
         //待选择的班级
-        ClassesOptions: [],
+        ClassesOptions: [{
+          id: 1,
+          name: '请先选择学院',
+          disabled: true
+        }],
 
         loading: false,
 
@@ -363,6 +371,7 @@
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
+    box-shadow: 2px 2px 10px #CDC9C9;
   }
 
   .title {

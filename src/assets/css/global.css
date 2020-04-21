@@ -36,6 +36,7 @@ html, body, #app {
   margin:0!important;
   display:flex;
   flex-direction:column;
+  border-radius: 15px;
   max-height:calc(100% - 30px);
   max-width:calc(100% - 30px);
 }
