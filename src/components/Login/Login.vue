@@ -147,7 +147,7 @@
       //自定义验证 确认密码
       const validatePass = (rule, value, callback) => {
         if (this.addForm.checkPass !== "") {
-          this.$refs.LoginFormRef.validateField("checkPass");
+          this.$refs.addFormRef.validateField("checkPass");
         }
         callback();
       };

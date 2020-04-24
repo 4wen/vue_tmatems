@@ -58,8 +58,6 @@
         <el-col :span="2">
           <el-button type="primary" @click="addDialogOpen">添加教师</el-button>
         </el-col>
-
-
       </el-row>
 
       <!-- 教师列表区域 -->

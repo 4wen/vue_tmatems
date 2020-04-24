@@ -6,6 +6,10 @@ import Welcome from '../components/Welcome.vue'
 import Student from "../components/Admin/Student";
 import Teacher from "../components/Admin/Teacher";
 import Admin from "../components/Admin/Admin";
+import College from "../components/Admin/College";
+import Classes from "../components/Admin/Classes";
+import Role from "../components/Admin/Role";
+import Permission from "../components/Admin/Permission";
 
 Vue.use(VueRouter);
 
@@ -20,7 +24,11 @@ const routes = [
       {path: '/welcome', component: Welcome},
       {path: '/student', component: Student},
       {path: '/teacher', component: Teacher},
-      {path: '/admin', component: Admin}
+      {path: '/admin', component: Admin},
+      {path: '/college', component: College},
+      {path: '/classes', component: Classes},
+      {path: '/role', component: Role},
+      {path: '/permission', component: Permission}
     ]
   }
 ];

@@ -41,7 +41,7 @@
             <!-- 一级菜单的模板 -->
             <template slot="title">
               <!-- 图标 -->
-              <i :class="item.icon"></i>
+              <i :class="item.icon"/>
               <!-- 文本 -->
               <span>{{item.authName}}</span>
             </template>
@@ -54,7 +54,7 @@
                     @click="saveNavState('/' + subItem.path)"
             >
               <!-- 图标 -->
-              <i class="el-icon-location"></i>
+              <i class="el-icon-location"/>
               <!-- 文本 -->
               <span>{{subItem.authName}}</span>
             </el-menu-item>
@@ -72,10 +72,24 @@
                 title="修改密码"
                 :visible.sync="updateDialogVisible"
                 width="40%"
-                @close="upadteDialogClosed"
+                @close="updateDialogClosed"
         >
-          <!-- 主体部分 -->
-          <el-input placeholder="请输入新密码" v-model="admin.password" show-password/>
+          <el-form
+                  :model="updateForm"
+                  status-icon
+                  :rules="updatePwdRules"
+                  ref="updatePwdRef"
+                  label-width="70px"
+          >
+            <!-- 主体部分 -->
+            <el-form-item label="密码" prop="password">
+              <el-input type="password" v-model="updateForm.password" clearable/>
+            </el-form-item>
+            <el-form-item label="确认密码" prop="checkPass">
+              <el-input type="password" v-model="updateForm.checkPass" auto-complete="off" clearable/>
+            </el-form-item>
+
+          </el-form>
 
           <!-- 底部 -->
           <span slot="footer" class="dialog-footer">
@@ -93,6 +107,22 @@
 <script>
   export default {
     data() {
+      //自定义验证 确认密码
+      const validatePass = (rule, value, callback) => {
+        if (this.updateForm.checkPass !== "") {
+          this.$refs.updatePwdRef.validateField("checkPass");
+        }
+        callback();
+      };
+      const validatePass2 = (rule, value, callback) => {
+        if (value === "") {
+          callback(new Error("请再次输入密码"));
+        } else if (value !== this.updateForm.password) {
+          callback(new Error("两次输入密码不一致!"));
+        } else {
+          callback();
+        }
+      };
       return {
         //超级管理员的菜单
         superAdminMenuList: [
@@ -131,121 +161,7 @@
               {
                 id: 6,
                 authName: "学院管理",
-                path: "coolege",
-                children: []
-              },
-              {
-                id: 7,
-                authName: "班级管理",
-                path: "classes",
-                children: []
-              },
-              {
-                id: 8,
-                authName: "课程管理",
-                path: "course",
-                children: []
-              },
-              {
-                id: 9,
-                authName: "教学材料管理",
-                path: "materials",
-                children: []
-              }
-            ]
-          },
-          {
-            id: 10,
-            authName: "教学评论管理",
-            icon: "el-icon-s-comment",
-            path: "review",
-            children: [
-              {
-                id: 11,
-                authName: "课堂评论",
-                path: "creview",
-                children: []
-              },
-              {
-                id: 12,
-                authName: "教师评论",
-                path: "treview",
-                children: []
-              },
-              {
-                id: 13,
-                authName: "教学材料评论",
-                path: "mreview",
-                children: []
-              }
-            ]
-          },
-          {
-            id: 14,
-            authName: "系统设置",
-            icon: "el-icon-s-grid",
-            path: "system",
-            children: [
-              {
-                id: 15,
-                authName: "角色列表",
-                path: "role",
-                children: []
-              },
-              {
-                id: 16,
-                authName: "权限列表",
-                path: "permission",
-                children: []
-              },
-              {
-                id: 17,
-                authName: "系统日志",
-                path: "log",
-                children: []
-              }
-            ]
-          }
-        ],
-
-        //学院管理员的菜单
-        adminMenuList: [
-          {
-            id: 1,
-            authName: "用户管理",
-            icon: "el-icon-s-custom",
-            path: "users",
-            children: [
-              {
-                id: 2,
-                authName: "学生管理",
-                path: "student",
-                children: []
-              },
-              {
-                id: 3,
-                authName: "教师管理",
-                path: "teacher",
-                children: []
-              }
-            ]
-          },
-          {
-            id: 4,
-            authName: "教务管理",
-            icon: "el-icon-s-management",
-            path: "affairs",
-            children: [
-              {
-                id: 5,
-                authName: "学院管理",
-                path: "coolege",
-                children: []
-              },
-              {
-                id: 6,
-                authName: "班级管理",
-                path: "classes",
+                path: "college",
                 children: []
               },
               {
@@ -287,6 +203,108 @@
                 children: []
               }
             ]
+          },
+          {
+            id: 13,
+            authName: "系统设置",
+            icon: "el-icon-s-grid",
+            path: "system",
+            children: [
+              {
+                id: 14,
+                authName: "角色列表",
+                path: "role",
+                children: []
+              },
+              {
+                id: 15,
+                authName: "权限列表",
+                path: "permission",
+                children: []
+              },
+              {
+                id: 16,
+                authName: "系统日志",
+                path: "log",
+                children: []
+              }
+            ]
+          }
+        ],
+
+        //学院管理员的菜单
+        adminMenuList: [
+          {
+            id: 1,
+            authName: "用户管理",
+            icon: "el-icon-s-custom",
+            path: "users",
+            children: [
+              {
+                id: 2,
+                authName: "学生管理",
+                path: "student",
+                children: []
+              },
+              {
+                id: 3,
+                authName: "教师管理",
+                path: "teacher",
+                children: []
+              }
+            ]
+          },
+          {
+            id: 4,
+            authName: "教务管理",
+            icon: "el-icon-s-management",
+            path: "affairs",
+            children: [
+              {
+                id: 5,
+                authName: "班级管理",
+                path: "classes",
+                children: []
+              },
+              {
+                id: 6,
+                authName: "课程管理",
+                path: "course",
+                children: []
+              },
+              {
+                id: 7,
+                authName: "教学材料管理",
+                path: "materials",
+                children: []
+              }
+            ]
+          },
+          {
+            id: 8,
+            authName: "教学评论管理",
+            icon: "el-icon-s-comment",
+            path: "review",
+            children: [
+              {
+                id: 9,
+                authName: "课堂评论",
+                path: "creview",
+                children: []
+              },
+              {
+                id: 10,
+                authName: "教师评论",
+                path: "treview",
+                children: []
+              },
+              {
+                id: 11,
+                authName: "教学材料评论",
+                path: "mreview",
+                children: []
+              }
+            ]
           }
         ],
 
@@ -294,9 +312,21 @@
         updateDialogVisible: false,
 
         //修改密码参数
-        admin: {
-          id: "",
-          password: ""
+        updateForm: {
+          password: "",
+          checkPass: ""
+        },
+
+        updatePwdRules: {
+          password: [
+            {required: true, message: "请输入密码", trigger: "blur"},
+            {validator: validatePass, trigger: "blur"},
+            {
+              pattern: /^(\w){6,20}$/,
+              message: "只能输入6-20个字母、数字、下划线的组合"
+            }
+          ],
+          checkPass: [{validator: validatePass2, trigger: "blur"}],
         },
 
         menulist: [], //菜单列表
@@ -316,37 +346,47 @@
       //根据角色加载菜单列表
       loadMenuListAndAdminName() {
         const role = window.sessionStorage.getItem("role");
-        if (role == 1) {
+        if (parseInt(role) === 1) {
           this.menulist = this.superAdminMenuList;
-        } else if (role == 4) {
+        } else if (parseInt(role) === 4) {
           this.menulist = this.adminMenuList;
         }
-        const name = window.sessionStorage.getItem("name");
-        this.adminName = name;
-
-        this.admin.id = this.$store.state.user.id;
+        this.adminName = window.sessionStorage.getItem("name");
       },
 
       //退出方法
-      logout() {
-        window.sessionStorage.clear();
-        setTimeout(()=> {
+      async logout() {
+        await this.$http.get("logout");
 
-        },500);
+        window.sessionStorage.clear();
+        setTimeout(() => {
+
+        }, 500);
+
         this.$router.push("/login");
       },
 
-      //学生注册对话框关闭事件
-      upadteDialogClosed() {
+      //修改密码对话框关闭事件
+      updateDialogClosed() {
         //对话框关闭时，表单重置
-        this.newPassword = "";
+        this.$refs.updatePwdRef.resetFields();
       },
 
       //修改密码
       async updatePassword() {
-        //console.log(this.newPassword)
-        const {data: res} = await this.$http.put("admin", this.admin);
-        console.log(res);
+
+        const {data: res} = await this.$http.put("admin",
+            {
+              id: this.$store.state.user.id,
+              password: this.updateForm.password
+            });
+        //console.log(res);
+        if (res.code === 200) {
+          this.$message.success("密码修改成功");
+          this.updateDialogVisible = false
+        } else {
+          this.$message.error("密码修改失败")
+        }
       },
 
       //菜单伸缩按钮
