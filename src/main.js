@@ -5,6 +5,8 @@ import store from './store'
 import './plugins/element.js'
 //导入全局样式表
 import './assets/css/global.css'
+//导入iconfont 图标
+import './assets/iconfont/iconfont.css'
 //导入elementUI的Loading,Message
 import { Message,Loading } from 'element-ui'
 
@@ -64,12 +66,12 @@ axios.interceptors.response.use(response => {
 
 });
 
-Vue.prototype.$http = axios //全局挂载axios
+Vue.prototype.$http = axios; //全局挂载axios
 
-Vue.config.productionTip = false
+Vue.config.productionTip = false;
 
 new Vue({
   router,
   store,
   render: h => h(App)
-}).$mount('#app')
+}).$mount('#app');

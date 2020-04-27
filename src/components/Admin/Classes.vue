@@ -35,7 +35,7 @@
           <el-button type="primary" icon="el-icon-search" @click="getClassesList">搜索</el-button>
         </el-col>
 
-        <el-col :span="2" :offset=10>
+        <el-col :span="2" :offset=12>
           <el-button type="primary" @click="addDialogOpen">添加班级</el-button>
         </el-col>
       </el-row>
@@ -46,7 +46,7 @@
               border
               stripe
       >
-        <el-table-column type="index" label="#"/>
+        <el-table-column type="index" label="#" align='center'/>
         <!-- 索引列 -->
         <el-table-column label="名称" prop="name" align='center'/>
         <el-table-column label="所属学院" prop="collegeName" align='center'/>

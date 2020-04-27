@@ -47,7 +47,7 @@
               border
               stripe
       >
-        <el-table-column type="index" label="#"/>
+        <el-table-column type="index" label="#" align='center'/>
         <!-- 索引列 -->
         <el-table-column label="姓名" prop="name" align='center'/>
         <el-table-column label="性别" prop="sex" align='center'>

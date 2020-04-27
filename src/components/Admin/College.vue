@@ -35,7 +35,7 @@
               border
               stripe
       >
-        <el-table-column type="index" label="#"/>
+        <el-table-column type="index" label="#" align='center'/>
         <!-- 学院展开列 -->
         <el-table-column type="expand">
           <template slot-scope="scope">

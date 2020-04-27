@@ -10,6 +10,10 @@ import College from "../components/Admin/College";
 import Classes from "../components/Admin/Classes";
 import Role from "../components/Admin/Role";
 import Permission from "../components/Admin/Permission";
+import Course from "../components/Admin/Course";
+import Shome from "../components/Student/Shome";
+import AllCourse from "../components/Student/AllCourse";
+import MineCourse from "../components/Student/MineCourse";
 
 Vue.use(VueRouter);
 
@@ -28,7 +32,17 @@ const routes = [
       {path: '/college', component: College},
       {path: '/classes', component: Classes},
       {path: '/role', component: Role},
-      {path: '/permission', component: Permission}
+      {path: '/permission', component: Permission},
+      {path: '/course', component: Course}
+    ]
+  },
+  {
+    path: '/shome',
+    component: Shome,
+    redirect: "/minecourse",
+    children: [
+      {path: '/minecourse', component: MineCourse},
+      {path: '/allcourse', component: AllCourse},
     ]
   }
 ];

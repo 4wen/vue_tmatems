@@ -67,7 +67,7 @@
               stripe
               @selection-change="handleSelectionChange"
       >
-        <el-table-column type="index" label="#"/>
+        <el-table-column type="index" label="#" align='center'/>
         <!-- 索引列 -->
         <el-table-column
                 type="selection"

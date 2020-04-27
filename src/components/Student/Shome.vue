@@ -3,15 +3,16 @@
     <!-- 头部区域开始 -->
     <el-header>
       <div>
-        <span>教学评估材料管理系统-管理员端</span>
+        <span>教学评估材料管理系统-学生端</span>
       </div>
       <el-dropdown>
         <span class="el-dropdown-link">
-          你好：{{adminName}}
+          你好：{{name}}
           <i class="el-icon-arrow-down el-icon--right"/>
         </span>
         <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item icon="el-icon-user" @click.native="updateDialogVisible = true">修改密码</el-dropdown-item>
+          <el-dropdown-item icon="el-icon-edit" @click.native="updateDialogVisible = true">修改密码</el-dropdown-item>
+          <el-dropdown-item icon="el-icon-user" @click.native="openDrawer">个人信息</el-dropdown-item>
           <el-dropdown-item icon="el-icon-switch-button" @click.native="logout">退出系统</el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
@@ -37,28 +38,17 @@
                 :default-active="activePath"
         >
           <!-- 一级菜单 -->
-          <el-submenu :index="item.id + ''" v-for="item in menulist" :key="item.id">
-            <!-- 一级菜单的模板 -->
-            <template slot="title">
-              <!-- 图标 -->
-              <i :class="item.icon"/>
-              <!-- 文本 -->
-              <span>{{item.authName}}</span>
-            </template>
+          <el-menu-item v-for="item in menulist"
+                        :index="'/' + item.path"
+                        :key="item.id"
+                        @click="saveNavState('/' + item.path)">
 
-            <!-- 二级菜单 -->
-            <el-menu-item
-                    :index="'/' + subItem.path"
-                    v-for="subItem in item.children"
-                    :key="subItem.id"
-                    @click="saveNavState('/' + subItem.path)"
-            >
-              <!-- 图标 -->
-              <i class="el-icon-location"/>
-              <!-- 文本 -->
-              <span>{{subItem.authName}}</span>
-            </el-menu-item>
-          </el-submenu>
+            <!-- 图标 -->
+            <i :class="item.icon"/>
+            <!-- 文本 -->
+            <span slot="title">{{item.authName}}</span>
+
+          </el-menu-item>
         </el-menu>
       </el-aside>
 
@@ -98,6 +88,42 @@
           </span>
         </el-dialog>
         <!-- 修改密码结束 -->
+
+        <!--查看个人信息抽屉-->
+        <el-drawer
+                title="查看个人信息"
+                :visible.sync="showDrawer"
+                direction="rtl"
+                custom-class="demo-drawer"
+                ref="drawer"
+        >
+          <div class="demo-drawer__content">
+            <el-form :model="DrawerForm">
+              <el-form-item label="姓名:" :label-width="formLabelWidth">
+                <span>{{DrawerForm.name}}</span>
+              </el-form-item>
+              <el-form-item label="用户名:" :label-width="formLabelWidth">
+                <span>{{DrawerForm.username}}</span>
+              </el-form-item>
+              <el-form-item label="性别:" :label-width="formLabelWidth">
+                <span>{{DrawerForm.sex ===1 ? '男':'女'}}</span>
+              </el-form-item>
+              <el-form-item label="学院:" :label-width="formLabelWidth">
+                <span>{{DrawerForm.collegeName}}</span>
+              </el-form-item>
+              <el-form-item label="班级:" :label-width="formLabelWidth">
+                <span>{{DrawerForm.classesName}}</span>
+              </el-form-item>
+            </el-form>
+            <div class="demo-drawer__footer">
+              <el-button @click="showDrawer = false">取 消</el-button>
+              <el-button type="primary"
+                         @click="$refs.drawer.closeDrawer()">确 定
+              </el-button>
+            </div>
+          </div>
+        </el-drawer>
+
       </el-main>
     </el-container>
     <!-- 主体结束 -->
@@ -106,7 +132,7 @@
 
 <script>
   export default {
-    name: "Home",
+    name: "Shome",
     data() {
       //自定义验证 确认密码
       const validatePass = (rule, value, callback) => {
@@ -125,186 +151,62 @@
         }
       };
       return {
-        //超级管理员的菜单
-        superAdminMenuList: [
+        //学生的菜单
+        studentMenuList: [
           {
             id: 1,
-            authName: "用户管理",
-            icon: "el-icon-s-custom",
-            path: "users",
-            children: [
-              {
-                id: 2,
-                authName: "学生管理",
-                path: "student",
-                children: []
-              },
-              {
-                id: 3,
-                authName: "教师管理",
-                path: "teacher",
-                children: []
-              },
-              {
-                id: 4,
-                authName: "管理员管理",
-                path: "admin",
-                children: []
-              }
-            ]
+            authName: "我的课程",
+            icon: "iconfont iconwodekecheng",
+            path: "minecourse"
+          },
+          {
+            id: 2,
+            authName: "学生选课",
+            icon: "iconfont iconsuoyou",
+            path: "allcourse"
+          },
+          {
+            id: 3,
+            authName: "课堂评论",
+            icon: "iconfont iconpinglun2",
+            path: "creview",
           },
           {
             id: 5,
-            authName: "教务管理",
-            icon: "el-icon-s-management",
-            path: "affairs",
-            children: [
-              {
-                id: 6,
-                authName: "学院管理",
-                path: "college",
-                children: []
-              },
-              {
-                id: 7,
-                authName: "课程管理",
-                path: "course",
-                children: []
-              },
-              {
-                id: 8,
-                authName: "教学材料管理",
-                path: "materials",
-                children: []
-              }
-            ]
+            authName: "教师评论",
+            icon: "iconfont iconpinglun1",
+            path: "treview",
           },
           {
-            id: 9,
-            authName: "教学评论管理",
-            icon: "el-icon-s-comment",
-            path: "review",
-            children: [
-              {
-                id: 10,
-                authName: "课堂评论",
-                path: "creview",
-                children: []
-              },
-              {
-                id: 11,
-                authName: "教师评论",
-                path: "treview",
-                children: []
-              },
-              {
-                id: 12,
-                authName: "教学材料评论",
-                path: "mreview",
-                children: []
-              }
-            ]
-          },
-          {
-            id: 13,
-            authName: "系统设置",
-            icon: "el-icon-s-grid",
-            path: "system",
-            children: [
-              {
-                id: 14,
-                authName: "角色列表",
-                path: "role",
-                children: []
-              },
-              {
-                id: 15,
-                authName: "权限列表",
-                path: "permission",
-                children: []
-              }
-            ]
-          }
-        ],
-
-        //学院管理员的菜单
-        adminMenuList: [
-          {
-            id: 1,
-            authName: "用户管理",
-            icon: "el-icon-s-custom",
-            path: "users",
-            children: [
-              {
-                id: 2,
-                authName: "学生管理",
-                path: "student",
-                children: []
-              },
-              {
-                id: 3,
-                authName: "教师管理",
-                path: "teacher",
-                children: []
-              }
-            ]
-          },
-          {
-            id: 4,
-            authName: "教务管理",
-            icon: "el-icon-s-management",
-            path: "affairs",
-            children: [
-              {
-                id: 5,
-                authName: "班级管理",
-                path: "classes",
-                children: []
-              },
-              {
-                id: 6,
-                authName: "课程管理",
-                path: "course",
-                children: []
-              },
-              {
-                id: 7,
-                authName: "教学材料管理",
-                path: "materials",
-                children: []
-              }
-            ]
-          },
-          {
-            id: 8,
-            authName: "教学评论管理",
-            icon: "el-icon-s-comment",
-            path: "review",
-            children: [
-              {
-                id: 9,
-                authName: "课堂评论",
-                path: "creview",
-                children: []
-              },
-              {
-                id: 10,
-                authName: "教师评论",
-                path: "treview",
-                children: []
-              },
-              {
-                id: 11,
-                authName: "教学材料评论",
-                path: "mreview",
-                children: []
-              }
-            ]
+            id: 6,
+            authName: "教学材料评论",
+            icon: "iconfont iconpinglun",
+            path: "mreview",
           }
         ],
 
         //修改密码对话框的 显示与隐藏
         updateDialogVisible: false,
+
+        //是否展示修改个人信息
+        showDrawer: false,
+
+        //修改个人信息参数
+        DrawerForm: {},
+
+        //性别选择框
+        SexOptions: [
+          {
+            id: 1,
+            name: '男',
+          },
+          {
+            id: 2,
+            name: '女',
+          }
+        ],
+
+        formLabelWidth: '60px',
 
         //修改密码参数
         updateForm: {
@@ -325,29 +227,29 @@
         },
 
         menulist: [], //菜单列表
-        adminName: "",
+        name: "",
 
         isCollapse: false, //是否折叠
-        activePath: "" //链接高亮 激活状态
+        isFirstMenu: false, //是否第一级菜单
+        activePath: "/minecourse" //链接高亮 激活状态
       };
     },
 
     created() {
-      this.loadMenuListAndAdminName();
-      this.activePath = window.sessionStorage.getItem("activePath");
+      this.loadMenuList();
+      if(window.sessionStorage.getItem("activePath")) {
+        this.activePath = window.sessionStorage.getItem("activePath");
+      }
+      this.name = window.sessionStorage.getItem("name");
     },
 
     methods: {
       //根据角色加载菜单列表
-      loadMenuListAndAdminName() {
-        console.log(123);
+      loadMenuList() {
         const role = window.sessionStorage.getItem("role");
-        if (parseInt(role) === 1) {
-          this.menulist = this.superAdminMenuList;
-        } else if (parseInt(role) === 4) {
-          this.menulist = this.adminMenuList;
+        if (parseInt(role) === 2) {
+          this.menulist = this.studentMenuList;
         }
-        this.adminName = window.sessionStorage.getItem("name");
       },
 
       //退出方法
@@ -362,6 +264,23 @@
         this.$router.push("/login");
       },
 
+      //打开修改信息
+      openDrawer() {
+        this.loadPersonalInformation();
+        this.showDrawer = true;
+      },
+
+      //加载个人信息
+      async loadPersonalInformation() {
+
+        const {data: res} = await this.$http.get("student/" + this.$store.state.user.id);
+
+        if (res.code === 200) {
+          this.DrawerForm = res.data.student;
+        }
+      },
+
+
       //修改密码对话框关闭事件
       updateDialogClosed() {
         //对话框关闭时，表单重置
@@ -370,8 +289,7 @@
 
       //修改密码
       async updatePassword() {
-
-        const {data: res} = await this.$http.put("admin",
+        const {data: res} = await this.$http.put("student",
             {
               id: this.$store.state.user.id,
               password: this.updateForm.password
@@ -381,7 +299,8 @@
           this.$message.success("密码修改成功");
           this.updateDialogVisible = false
         } else {
-          this.$message.error("密码修改失败")
+          this.$message.error("密码修改失败");
+          this.updateDialogVisible = false
         }
       },
 
@@ -389,16 +308,20 @@
       toggleCollapse() {
         this.isCollapse = !this.isCollapse;
       },
+
       //保存链接的激活状态
       saveNavState(activePath) {
         window.sessionStorage.setItem("activePath", activePath);
         this.activePath = activePath;
       }
     }
-  };
+
+
+  }
 </script>
 
 <style lang="less" scoped>
+
   .home-container {
     height: 100%;
   }
@@ -455,4 +378,22 @@
   .el-icon-arrow-down {
     font-size: 12px;
   }
+
+  /deep/ :focus {
+
+    outline: 0;
+
+  }
+
+  .demo-drawer__footer {
+    width: 100%;
+    bottom: 0;
+    left: 0;
+    border-top: 1px solid #e8e8e8;
+    padding: 10px 16px;
+    text-align: center;
+    background-color: white;
+  }
+
+
 </style>
