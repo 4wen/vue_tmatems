@@ -163,6 +163,7 @@
           return this.$message.error("选课失败");
         } else {
           this.$message.success("选课成功");
+          this.getCourseList();
         }
 
       },

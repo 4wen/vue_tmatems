@@ -340,7 +340,7 @@
     methods: {
       //根据角色加载菜单列表
       loadMenuListAndAdminName() {
-        console.log(123);
+
         const role = window.sessionStorage.getItem("role");
         if (parseInt(role) === 1) {
           this.menulist = this.superAdminMenuList;

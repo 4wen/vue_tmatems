@@ -54,9 +54,9 @@
       <el-pagination
               @size-change="handleSizeChange"
               @current-change="handleCurrentChange"
-              :current-page="queryInfo.pagenum"
+              :current-page="pagenum"
               :page-sizes="[1, 2, 5, 10]"
-              :page-size="queryInfo.pagesize"
+              :page-size="pagesize"
               layout="total, sizes, prev, pager, next, jumper"
               :total="total"
       />
@@ -74,11 +74,9 @@
         //课程列表
         courseData: [],
 
-        //查询的参数对象
-        queryInfo: {
-          pagenum: 1, //当前页数
-          pagesize: 10 //当前每页显示几条数据
-        },
+        pagenum: 1, //当前页数
+        pagesize: 10, //当前每页显示几条数据
+
 
         total: 0,
 
@@ -91,8 +89,10 @@
 
       //获得课程列表
       async getCourseList() {
-        const {data: res} = await this.$http.get("scourse/" + this.$store.state.user.id,
-            this.queryInfo);
+        const {data: res} = await this.$http.get("scourse/" +
+            this.$store.state.user.id + "/" +
+            this.pagenum + "/" +
+            this.pagesize);
         //console.log(res);
         if (res.code !== 200) {
           return this.$message.error("获取课程列表失败");

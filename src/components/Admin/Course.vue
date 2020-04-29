@@ -67,13 +67,11 @@
               highlight-current-row
               @selection-change="handleSelectionChange"
       >
-        <el-table-column type="index" label="#" align='center'/>
-        <!-- 索引列 -->
         <el-table-column
                 type="selection"
                 width="55">
         </el-table-column>
-        <el-table-column label="课程ID" prop="id" align='center'/>
+        <el-table-column type="index" label="#" align='center'/>
         <el-table-column label="课程名" prop="name" align='center'/>
         <el-table-column label="所属学院" prop="collegeName" align='center'/>
         <el-table-column label="年级" prop="level" align='center'>
@@ -86,7 +84,23 @@
         </el-table-column>
         <el-table-column label="任课教师" prop="teacherName" align='center'/>
         <el-table-column label="课程描述" prop="remark" :show-overflow-tooltip="true" width="400" align='center'/>
-        <el-table-column label="操作" :width="isSuperAdmin ? '60px' : '180px'" align='center'>
+        <el-table-column label="课堂评论" prop="isok" align='center'>
+          <template slot-scope="scope">
+            <!--            <el-tag v-if="scope.row.isok === 1">已开启</el-tag>-->
+            <!--            <el-tag type="success" v-else>未开启</el-tag>-->
+            <el-tooltip :content="scope.row.isok ===1?'已开启':'未开启'" placement="top">
+              <el-switch
+                      v-model="scope.row.isok"
+                      active-color="#13ce66"
+                      inactive-color="#ff4949"
+                      :active-value=1
+                      :inactive-value=0
+                      @change="openAndCloseComment(scope.row.id)">
+              </el-switch>
+            </el-tooltip>
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" :width="isSuperAdmin ? '120px' : '180px'" align='center'>
           <template slot-scope="scope">
             <!-- 修改按钮 -->
             <el-tooltip effect="dark" content="修改课程" placement="top" :enterable="false">
@@ -109,13 +123,13 @@
               />
             </el-tooltip>
 
-            <!-- 开启教评按钮 -->
-            <el-tooltip effect="dark" content="开启课堂评论" placement="top" :enterable="false">
+            <!-- 查看课程评论按钮 -->
+            <el-tooltip effect="dark" content="查看课程评论" placement="top" :enterable="false">
               <el-button
-                      type="warning"
-                      icon="el-icon-setting"
+                      type="primary"
+                      icon="el-icon-search"
                       size="mini"
-                      @click=""
+                      @click="showReviewDialog(scope)"
               />
             </el-tooltip>
           </template>
@@ -246,10 +260,51 @@
         <el-button type="primary" @click="addCourse">确 定</el-button>
       </span>
     </el-dialog>
+
+    <!-- 查看教评对话框 -->
+    <el-dialog :title="reviewName+' 课堂评论详情'"
+               :visible.sync="reviewDialogVisible"
+               @close="reviewDialogClosed"
+               width="450px">
+      <!-- 主体部分 -->
+      <div><span>参与教评学生数：{{number}}</span></div>
+
+      <div>
+        <span>{{questions[0]}}</span>
+        <div id="main1" style="width: 300px;height:200px;"></div>
+      </div>
+      <div>
+        <span>{{questions[1]}}</span>
+        <div id="main2" style="width: 300px;height:200px;"></div>
+      </div>
+      <div>
+        <span>{{questions[2]}}</span>
+        <div id="main3" style="width: 300px;height:200px;"></div>
+      </div>
+      <div>
+        <span>{{questions[3]}}</span>
+        <div id="main4" style="width: 300px;height:200px;"></div>
+      </div>
+      <div>
+        <span>{{questions[4]}}</span>
+        <div id="main5" style="width: 300px;height:200px;"></div>
+      </div>
+
+
+      <!-- 底部 -->
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="reviewDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="reviewDialogVisible = false">确 定</el-button>
+      </span>
+    </el-dialog>
+
+
   </div>
 </template>
 
 <script>
+  import echarts from 'echarts'
+
   export default {
     name: "Course",
     data() {
@@ -304,8 +359,7 @@
 
         //修改表单的验证规则对象
         editFormRules: {
-          name: [
-          ],
+          name: [],
           sex: [{required: true, message: "请选择性别", trigger: "blur"}],
           college: [{required: true, message: "请选择学院", trigger: "blur"}],
           title: [{required: true, message: "请选择职称", trigger: "blur"}]
@@ -334,7 +388,30 @@
           level: [{required: true, message: "请选择年级", trigger: "blur"}],
           teacher: [{required: true, message: "请选择任课教师", trigger: "blur"}],
           remark: [{required: true, message: "请填写课程描述", trigger: "blur"}]
-        }
+        },
+
+        isok: [{
+          id: 1,
+        }],
+
+        //课堂评论的课程名
+        reviewName: "",
+
+        //教评对话框的开启和关闭
+        reviewDialogVisible: false,
+
+        //教评问题
+        questions: [],
+
+        //教评参与的人数
+        number: 0,
+
+        question1:{},
+        question2:{},
+        question3:{},
+        question4:{},
+        question5:{},
+
       }
     },
 
@@ -532,13 +609,226 @@
         } else {
           this.$message.error(res.msg);
         }
+      },
+
+     //开启 关闭课堂评论
+      async openAndCloseComment(id) {
+        const {data: res} = await this.$http.put("course/" + id);
+        if (res.code !== 200) {
+          return this.$message.error(res.msg);
+        } else {
+          this.$message.success(res.msg);
+          this.getCourseList();
+        }
+      },
+
+
+      //加载教评问题
+      async loadQuestion() {
+        const {data: res} = await this.$http.get("getquestion");
+
+        if (res.code !== 200) {
+          return this.$message.error("操作失败");
+        } else {
+          let newQuestion = [5];
+          res.data.questions.map(function (value, index) {
+
+            newQuestion[index] = value.question;
+          });
+          this.questions = newQuestion;
+        }
+      },
+      
+      reviewDialogClosed() {
+        this.question1={};
+        this.question2={};
+        this.question3={};
+        this.question4={};
+        this.question5={};
+      },
+      //展示课堂评论
+      showReviewDialog(scope) {
+        if (scope.row.isok === 1) {
+          this.reviewName = scope.row.name;
+          this.reviewDialogVisible = true;
+          this.loadQuestion();
+          this.openEcharts(scope.row.id);
+        } else {
+          this.$message.error("此课程暂未开启教评");
+        }
+      },
+
+      //渲染 echarts
+       openEcharts(id) {
+        this.$nextTick(async function () {
+          const {data: res} = await this.$http.get("ccomment/"+id);
+          if (res.code !== 200) {
+            return this.$message.error("操作失败");
+          } else {
+            this.number = res.data.number;
+
+            for(var i= 0, l =  res.data.question1List.length; i< l; i++){
+              var item = res.data.question1List[i];
+              this.question1[item] = (this.question1[item] +1 ) || 1;
+            }
+
+            console.log(this.question1);
+
+            for(var i= 0, l = res.data.question2List.length; i< l; i++){
+              var item = res.data.question2List[i];
+              this.question2[item] = (this.question2[item] +1 ) || 1;
+            }
+
+            let question3List = res.data.question3List;
+            for(var i= 0, l = question3List.length; i< l; i++){
+              var item = question3List[i];
+              this.question3[item] = (this.question3[item] +1 ) || 1;
+            }
+
+            let question4List = res.data.question4List;
+            for(var i= 0, l = question4List.length; i< l; i++){
+              var item = question4List[i];
+              this.question4[item] = (this.question4[item] +1 ) || 1;
+            }
+
+            let question5List = res.data.question5List;
+            for(var i= 0, l = question5List.length; i< l; i++){
+              var item = question5List[i];
+              this.question5[item] = (this.question5[item] +1 ) || 1;
+            }
+
+          }
+
+          // 基于准备好的dom，初始化echarts实例
+          let main1 = document.getElementById("main1");
+          let main2 = document.getElementById("main2");
+          let main3 = document.getElementById("main3");
+          let main4 = document.getElementById("main4");
+          let main5 = document.getElementById("main5");
+
+          const myChart1 = echarts.init(main1);
+          const myChart2 = echarts.init(main2);
+          const myChart3 = echarts.init(main3);
+          const myChart4 = echarts.init(main4);
+          const myChart5 = echarts.init(main5);
+
+          myChart1.setOption({
+            series: [
+              {
+                name: '访问来源',
+                type: 'pie',
+                roseType: 'angle',
+                radius: '55%',
+                data: [
+                  {value: this.question1["5"], name: '优秀'},
+                  {value: this.question1["4"], name: '良好'},
+                  {value: this.question1["3"], name: '一般'},
+                  {value: this.question1["2"], name: '差'},
+                  {value: this.question1["1"], name: '很差'}
+                ]
+              }
+            ]
+          });
+
+          myChart2.setOption({
+            series: [
+              {
+                name: '访问来源',
+                type: 'pie',
+                roseType: 'angle',
+                radius: '55%',
+                data: [
+                  {value: this.question2["5"], name: '优秀'},
+                  {value: this.question2["4"], name: '良好'},
+                  {value: this.question2["3"], name: '一般'},
+                  {value: this.question2["2"], name: '差'},
+                  {value: this.question2["1"], name: '很差'}
+                ]
+              }
+            ]
+          });
+
+          myChart3.setOption({
+            series: [
+              {
+                name: '访问来源',
+                type: 'pie',
+                roseType: 'angle',
+                radius: '55%',
+                data: [
+                  {value: this.question3["5"], name: '优秀'},
+                  {value: this.question3["4"], name: '良好'},
+                  {value: this.question3["3"], name: '一般'},
+                  {value: this.question3["2"], name: '差'},
+                  {value: this.question3["1"], name: '很差'}
+                ]
+              }
+            ]
+          });
+
+          myChart4.setOption({
+            series: [
+              {
+                name: '访问来源',
+                type: 'pie',
+                roseType: 'angle',
+                radius: '55%',
+                data: [
+                  {value: this.question4["5"], name: '优秀'},
+                  {value: this.question4["4"], name: '良好'},
+                  {value: this.question4["3"], name: '一般'},
+                  {value: this.question4["2"], name: '差'},
+                  {value: this.question4["1"], name: '很差'}
+                ]
+              }
+            ]
+          });
+
+          myChart5.setOption({
+            series: [
+              {
+                name: '访问来源',
+                type: 'pie',
+                roseType: 'angle',
+                radius: '55%',
+                data: [
+                  {value: this.question5["5"], name: '优秀'},
+                  {value: this.question5["4"], name: '良好'},
+                  {value: this.question5["3"], name: '一般'},
+                  {value: this.question5["2"], name: '差'},
+                  {value: this.question5["1"], name: '很差'}
+                ]
+              }
+            ]
+          });
+
+
+        });
       }
+    },
+
+    mounted() {
+
     }
 
 
   }
 </script>
 
-<style scoped>
+<style lang="less" scoped>
+  /deep/ :focus {
 
+    outline: 0;
+
+  }
+
+  .demo-drawer__footer {
+    width: 100%;
+    bottom: 0;
+    left: 0;
+    border-top: 1px solid #e8e8e8;
+    padding: 10px 16px;
+    text-align: center;
+    background-color: white;
+  }
 </style>

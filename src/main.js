@@ -10,7 +10,6 @@ import './assets/iconfont/iconfont.css'
 //导入elementUI的Loading,Message
 import { Message,Loading } from 'element-ui'
 
-
 let loading;
 
 function startLoading() {
