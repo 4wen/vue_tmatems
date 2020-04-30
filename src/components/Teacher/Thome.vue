@@ -3,7 +3,7 @@
     <!-- 头部区域开始 -->
     <el-header>
       <div>
-        <span>高校教学及评估管理系统-学生端</span>
+        <span>高校教学及评估管理系统-教师端</span>
       </div>
       <el-dropdown>
         <span class="el-dropdown-link">
@@ -111,8 +111,10 @@
               <el-form-item label="学院:" :label-width="formLabelWidth">
                 <span>{{DrawerForm.collegeName}}</span>
               </el-form-item>
-              <el-form-item label="班级:" :label-width="formLabelWidth">
-                <span>{{DrawerForm.classesName}}</span>
+              <el-form-item label="职称:" :label-width="formLabelWidth">
+               <span v-if="DrawerForm.title===0">讲师</span>
+                <span v-else-if="DrawerForm.title===1">副教授</span>
+                <span v-else>教授</span>
               </el-form-item>
             </el-form>
             <div class="demo-drawer__footer">
@@ -132,7 +134,7 @@
 
 <script>
   export default {
-    name: "Shome",
+    name: "Thome",
     data() {
       //自定义验证 确认密码
       const validatePass = (rule, value, callback) => {
@@ -151,37 +153,19 @@
         }
       };
       return {
-        //学生的菜单
-        studentMenuList: [
+        //教师的菜单
+        teacherMenuList: [
           {
             id: 1,
             authName: "我的课程",
             icon: "iconfont iconwodekecheng",
-            path: "minecourse"
+            path: "tcourse"
           },
           {
             id: 2,
-            authName: "学生选课",
+            authName: "教学材料管理",
             icon: "iconfont iconsuoyou",
-            path: "allcourse"
-          },
-          {
-            id: 3,
-            authName: "课堂评论",
-            icon: "iconfont iconpinglun2",
-            path: "creview",
-          },
-          {
-            id: 5,
-            authName: "教师评论",
-            icon: "iconfont iconpinglun1",
-            path: "treview",
-          },
-          {
-            id: 6,
-            authName: "教学材料评论",
-            icon: "iconfont iconpinglun",
-            path: "mreview",
+            path: "materials",
           }
         ],
 
@@ -191,7 +175,7 @@
         //是否展示修改个人信息
         showDrawer: false,
 
-        //修改个人信息参数
+        //个人信息参数
         DrawerForm: {},
 
         //性别选择框
@@ -231,7 +215,8 @@
 
         isCollapse: false, //是否折叠
         isFirstMenu: false, //是否第一级菜单
-        activePath: "/minecourse" //链接高亮 激活状态
+        activePath: "/tcourse" //链接高亮 激活状态
+
       };
     },
 
@@ -240,6 +225,7 @@
       if(window.sessionStorage.getItem("activePath")) {
         this.activePath = window.sessionStorage.getItem("activePath");
       }
+
       this.name = window.sessionStorage.getItem("name");
     },
 
@@ -247,8 +233,8 @@
       //根据角色加载菜单列表
       loadMenuList() {
         const role = window.sessionStorage.getItem("role");
-        if (parseInt(role) === 2) {
-          this.menulist = this.studentMenuList;
+        if (parseInt(role) === 3) {
+          this.menulist = this.teacherMenuList;
         }
       },
 
@@ -264,7 +250,7 @@
         this.$router.push("/login");
       },
 
-      //打个人信息
+      //打开个人信息
       openDrawer() {
         this.loadPersonalInformation();
         this.showDrawer = true;
@@ -273,10 +259,10 @@
       //加载个人信息
       async loadPersonalInformation() {
 
-        const {data: res} = await this.$http.get("student/" + this.$store.state.user.id);
+        const {data: res} = await this.$http.get("teacher/byId/" + this.$store.state.user.id);
 
         if (res.code === 200) {
-          this.DrawerForm = res.data.student;
+          this.DrawerForm = res.data.teacher;
         }
       },
 
@@ -288,11 +274,11 @@
       },
 
       //修改密码
-       updatePassword() {
+      async updatePassword() {
         this.$refs.updatePwdRef.validate(async valid => {
           if (!valid) return; //预验证 未通过
           // 发起修改管理员信息的数据请求
-          const {data: res} = await this.$http.put("student",
+          const {data: res} = await this.$http.put("teacher",
               {
                 id: this.$store.state.user.id,
                 password: this.updateForm.password
@@ -319,13 +305,10 @@
         this.activePath = activePath;
       }
     }
-
-
   }
 </script>
 
 <style lang="less" scoped>
-
   .home-container {
     height: 100%;
   }
@@ -398,6 +381,5 @@
     text-align: center;
     background-color: white;
   }
-
 
 </style>

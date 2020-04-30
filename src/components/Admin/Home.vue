@@ -3,7 +3,7 @@
     <!-- 头部区域开始 -->
     <el-header>
       <div>
-        <span>教学评估材料管理系统-管理员端</span>
+        <span>高校教学及评估管理系统-管理员端</span>
       </div>
       <el-dropdown>
         <span class="el-dropdown-link">
@@ -369,20 +369,23 @@
       },
 
       //修改密码
-      async updatePassword() {
-
-        const {data: res} = await this.$http.put("admin",
-            {
-              id: this.$store.state.user.id,
-              password: this.updateForm.password
-            });
-        //console.log(res);
-        if (res.code === 200) {
-          this.$message.success("密码修改成功");
-          this.updateDialogVisible = false
-        } else {
-          this.$message.error("密码修改失败")
-        }
+       updatePassword() {
+        this.$refs.updatePwdRef.validate(async valid => {
+          if (!valid) return; //预验证 未通过
+          // 发起修改管理员信息的数据请求
+          const {data: res} = await this.$http.put("admin",
+              {
+                id: this.$store.state.user.id,
+                password: this.updateForm.password
+              });
+          //console.log(res);
+          if (res.code === 200) {
+            this.$message.success("密码修改成功");
+            this.updateDialogVisible = false
+          } else {
+            this.$message.error("密码修改失败")
+          }
+        });
       },
 
       //菜单伸缩按钮

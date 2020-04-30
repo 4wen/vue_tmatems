@@ -74,14 +74,15 @@ export default {
         window.sessionStorage.setItem("token", "Bearer "+res.data);
         //college存入vuex
         const decode = jwt_decode(res.data);
-        this.$store.commit("getUserCollegeId",decode.teacher.college);
+        this.$store.commit("getUser",decode.teacher);
         //用户类型存入sessionStorage
-        window.sessionStorage.setItem("role",decode.role);
-        window.sessionStorage.setItem("name",decode.teacher.name);
+        window.sessionStorage.setItem("role", decode.role);
+        window.sessionStorage.setItem("name", decode.teacher.name);
+        window.sessionStorage.setItem("college",decode.teacher.college);
 
         this.$message.success(res.msg);
         // 通过编程式导航跳转到后台主页，路由地址是 /home
-        this.$router.push("/home");
+        this.$router.push("/thome");
       });
     },
   }

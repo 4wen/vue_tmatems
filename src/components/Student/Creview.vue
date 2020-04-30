@@ -138,7 +138,8 @@
 
         //添加表单的验证规则对象
         reviewFormRules: {
-          suggest: [{required: true, message: "请填写课程描述", trigger: "blur"}]
+          suggest: [{required: true, message: "请填写课程描述", trigger: "blur"},
+            {min: 30, message: "长度最少30个字符", trigger: "blur"}]
         }
 
       }

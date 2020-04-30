@@ -15,6 +15,9 @@ import Shome from "../components/Student/Shome";
 import AllCourse from "../components/Student/AllCourse";
 import MineCourse from "../components/Student/MineCourse";
 import Creview from "../components/Student/Creview";
+import Thome from "../components/Teacher/Thome";
+import Tcourse from "../components/Teacher/Tcourse";
+import Materials from "../components/Teacher/Materials";
 
 Vue.use(VueRouter);
 
@@ -45,6 +48,15 @@ const routes = [
       {path: '/minecourse', component: MineCourse},
       {path: '/allcourse', component: AllCourse},
       {path: '/creview', component: Creview},
+    ]
+  },
+  {
+    path: '/thome',
+    component: Thome,
+    redirect: "/tcourse",
+    children: [
+      {path: '/tcourse', component: Tcourse},
+      {path: '/materials', component: Materials},
     ]
   }
 ];
