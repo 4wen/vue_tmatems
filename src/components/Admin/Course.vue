@@ -100,7 +100,7 @@
             </el-tooltip>
           </template>
         </el-table-column>
-        <el-table-column label="操作" :width="isSuperAdmin ? '120px' : '180px'" align='center'>
+        <el-table-column label="操作" :width="isSuperAdmin ? '180px' : '240px'" align='center'>
           <template slot-scope="scope">
             <!-- 修改按钮 -->
             <el-tooltip effect="dark" content="修改课程" placement="top" :enterable="false">
@@ -130,6 +130,16 @@
                       icon="el-icon-search"
                       size="mini"
                       @click="showReviewDialog(scope)"
+              />
+            </el-tooltip>
+
+            <!-- 查看教学材料按钮 -->
+            <el-tooltip effect="dark" content="查看教学材料" placement="top" :enterable="false">
+              <el-button
+                      type="warning"
+                      icon="el-icon-warning-outline"
+                      size="mini"
+                      @click="openMaterial(scope.row.id,scope.row.name)"
               />
             </el-tooltip>
           </template>
@@ -637,6 +647,13 @@
           });
           this.questions = newQuestion;
         }
+      },
+
+      //打开教学材料
+      openMaterial(id,name) {
+        window.sessionStorage.setItem("cid",id);
+        window.sessionStorage.setItem("cname",name);
+        this.$router.push("/amaterials");
       },
       
       reviewDialogClosed() {

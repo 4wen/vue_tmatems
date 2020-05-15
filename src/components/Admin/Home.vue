@@ -170,55 +170,24 @@
                 authName: "课程管理",
                 path: "course",
                 children: []
-              },
-              {
-                id: 8,
-                authName: "教学材料管理",
-                path: "materials",
-                children: []
               }
             ]
           },
+
           {
-            id: 9,
-            authName: "教学评论管理",
-            icon: "el-icon-s-comment",
-            path: "review",
-            children: [
-              {
-                id: 10,
-                authName: "课堂评论",
-                path: "creview",
-                children: []
-              },
-              {
-                id: 11,
-                authName: "教师评论",
-                path: "treview",
-                children: []
-              },
-              {
-                id: 12,
-                authName: "教学材料评论",
-                path: "mreview",
-                children: []
-              }
-            ]
-          },
-          {
-            id: 13,
+            id: 8,
             authName: "系统设置",
             icon: "el-icon-s-grid",
             path: "system",
             children: [
               {
-                id: 14,
+                id: 9,
                 authName: "角色列表",
                 path: "role",
                 children: []
               },
               {
-                id: 15,
+                id: 10,
                 authName: "权限列表",
                 path: "permission",
                 children: []
@@ -266,41 +235,10 @@
                 authName: "课程管理",
                 path: "course",
                 children: []
-              },
-              {
-                id: 7,
-                authName: "教学材料管理",
-                path: "materials",
-                children: []
               }
             ]
           },
-          {
-            id: 8,
-            authName: "教学评论管理",
-            icon: "el-icon-s-comment",
-            path: "review",
-            children: [
-              {
-                id: 9,
-                authName: "课堂评论",
-                path: "creview",
-                children: []
-              },
-              {
-                id: 10,
-                authName: "教师评论",
-                path: "treview",
-                children: []
-              },
-              {
-                id: 11,
-                authName: "教学材料评论",
-                path: "mreview",
-                children: []
-              }
-            ]
-          }
+
         ],
 
         //修改密码对话框的 显示与隐藏

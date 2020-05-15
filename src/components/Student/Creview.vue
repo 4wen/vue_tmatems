@@ -3,7 +3,7 @@
     <!-- 面包屑导航区域 -->
     <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item>首页</el-breadcrumb-item>
-      <el-breadcrumb-item>我的课程</el-breadcrumb-item>
+      <el-breadcrumb-item>课堂评论</el-breadcrumb-item>
     </el-breadcrumb>
     <!-- 面包屑导航区域结束 -->
     <el-card>

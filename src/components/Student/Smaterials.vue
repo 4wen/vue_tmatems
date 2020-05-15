@@ -3,48 +3,40 @@
     <!-- 面包屑导航区域 -->
     <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item>首页</el-breadcrumb-item>
-      <el-breadcrumb-item>我的课程</el-breadcrumb-item>
+      <el-breadcrumb-item :to="{path:'/minecourse'}">我的课程</el-breadcrumb-item>
+      <el-breadcrumb-item>{{cname}} 的教学材料</el-breadcrumb-item>
     </el-breadcrumb>
     <!-- 面包屑导航区域结束 -->
+
+    <!-- 卡片视图区域 -->
     <el-card>
       <el-table
-              :data="courseData"
+              :data="materialList"
               style="width: 100%">
+        <el-table-column type="index" label="#" align='center'/>
         <el-table-column
-                label="课程 ID"
-                prop="cid"
-                style="width: 10px">
-        </el-table-column>
-        <el-table-column
-                label="课程名称"
+                label="文件"
                 prop="name"
-                style="width: 30px">
+                align='center'>
         </el-table-column>
         <el-table-column
-                label="所属学院"
-                prop="collegeName"
-                style="width: 30px">
+                label="上传时间"
+                prop="time"
+                align='center'>
         </el-table-column>
         <el-table-column
-                label="任课教师"
-                prop="teacherName"
-                style="width: 30px">
-        </el-table-column>
-        <el-table-column
-                label="课程描述"
+                label="详情"
                 prop="remark"
-                :show-overflow-tooltip="true">
-        </el-table-column>
+                :show-overflow-tooltip="true" align='center'/>
         <el-table-column label="操作" width="60px" align='center'>
           <template slot-scope="scope">
-
-            <!-- 查看教学材料按钮 -->
-            <el-tooltip effect="dark" content="查看教学材料" placement="top" :enterable="false">
+            <!-- 下载教学材料按钮 -->
+            <el-tooltip effect="dark" content="下载教学材料" placement="top" :enterable="false">
               <el-button
                       type="primary"
-                      icon="el-icon-warning-outline"
+                      icon="el-icon-download"
                       size="mini"
-                      @click="openMaterial(scope.row.cid,scope.row.name)"
+                      @click="fileDownload(scope.row.url)"
               />
             </el-tooltip>
           </template>
@@ -62,67 +54,71 @@
               :total="total"
       />
     </el-card>
-    <!--卡片视图结束-->
 
   </div>
 </template>
 
 <script>
   export default {
-    name: "MineCourse",
+    name: "Amaterials",
     data() {
       return {
+        //课程名
+        cname: "",
+
         //课程列表
-        courseData: [],
+        materialList: [],
 
         pagenum: 1, //当前页数
         pagesize: 10, //当前每页显示几条数据
-
 
         total: 0,
 
       }
     },
+
     created() {
-      this.getCourseList();
+      this.cname = window.sessionStorage.getItem("cname");
+      this.getMaterialList();
     },
+
     methods: {
 
-      //获得课程列表
-      async getCourseList() {
-        const {data: res} = await this.$http.get("scourse/" +
-            this.$store.state.user.id + "/" +
-            this.pagenum + "/" +
-            this.pagesize);
+      //获得教学材料列表
+      async getMaterialList() {
+        const {data: res} = await this.$http.get("materials", {
+          params: {
+            cid: window.sessionStorage.getItem("cid"),
+            pagenum: this.pagenum,
+            pagesize: this.pagesize
+          }
+        });
         //console.log(res);
         if (res.code !== 200) {
           return this.$message.error("获取课程列表失败");
-        } else {
-          this.courseData = res.data.courses;
-          this.total = res.data.total;
         }
-
+        this.materialList = res.data.materials;
+        this.total = res.data.total;
       },
 
       //监听pagesize 改变的事件
       handleSizeChange(newSize) {
         // console.log(newSize);
         this.pagesize = newSize; //每页显示页数改变
-        this.getCourseList(); //重新调用获得用户列表方法
+        this.getMaterialList(); //重新调用获得用户列表方法
       },
 
       //监听页码值改变的事件
       handleCurrentChange(newPage) {
         this.pagenum = newPage; //页码值改变
-        this.getCourseList();
+        this.getMaterialList();
       },
 
-      //打开教学材料
-      openMaterial(id,name) {
-        window.sessionStorage.setItem("cid",id);
-        window.sessionStorage.setItem("cname",name);
-        this.$router.push("/smaterials");
+      //下载教学材料
+      fileDownload(url) {
+        window.open("http://192.168.89.131/"+url);
       }
+
     }
 
   }

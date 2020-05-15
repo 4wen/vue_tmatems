@@ -170,18 +170,6 @@
             authName: "课堂评论",
             icon: "iconfont iconpinglun2",
             path: "creview",
-          },
-          {
-            id: 5,
-            authName: "教师评论",
-            icon: "iconfont iconpinglun1",
-            path: "treview",
-          },
-          {
-            id: 6,
-            authName: "教学材料评论",
-            icon: "iconfont iconpinglun",
-            path: "mreview",
           }
         ],
 

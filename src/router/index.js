@@ -18,6 +18,8 @@ import Creview from "../components/Student/Creview";
 import Thome from "../components/Teacher/Thome";
 import Tcourse from "../components/Teacher/Tcourse";
 import Materials from "../components/Teacher/Materials";
+import Amaterials from "../components/Admin/Amaterials";
+import Smaterials from "../components/Student/Smaterials";
 
 Vue.use(VueRouter);
 
@@ -37,7 +39,8 @@ const routes = [
       {path: '/classes', component: Classes},
       {path: '/role', component: Role},
       {path: '/permission', component: Permission},
-      {path: '/course', component: Course}
+      {path: '/course', component: Course},
+      {path: '/amaterials', component: Amaterials},
     ]
   },
   {
@@ -48,6 +51,7 @@ const routes = [
       {path: '/minecourse', component: MineCourse},
       {path: '/allcourse', component: AllCourse},
       {path: '/creview', component: Creview},
+      {path: '/smaterials', component: Smaterials},
     ]
   },
   {

@@ -642,13 +642,13 @@
 
       //去数据库查询是否存在用户名
       async validateStudent(username) {
-        const {data: res} = await this.$http.get("/teacher/byUsername/" + username);
+        const {data: res} = await this.$http.get("teacher/byUsername/" + username);
         return res;
       },
 
       //添加教师
       async addUser() {
-        const {data: res} = await this.$http.post("/teacher", this.addForm);
+        const {data: res} = await this.$http.post("teacher", this.addForm);
         if (res.code === 200) {
           this.$message.success(res.msg);
           this.addDialogVisible = false;

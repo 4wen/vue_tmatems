@@ -22,34 +22,8 @@
     <!-- 主体开始 -->
     <el-container>
       <!-- 侧边栏 -->
-      <el-aside :width="isCollapse ? '64px' : '200px'">
-        <!-- 菜单伸缩按钮 -->
-        <div class="toggle-button" @click="toggleCollapse">|||</div>
+      <el-aside width="0px">
 
-        <!-- 侧边栏菜单 -->
-        <el-menu
-                background-color="#333744"
-                text-color="#fff"
-                active-text-color="#409EFF"
-                unique-opened
-                :collapse="isCollapse"
-                :collapse-transition="false"
-                router
-                :default-active="activePath"
-        >
-          <!-- 一级菜单 -->
-          <el-menu-item v-for="item in menulist"
-                        :index="'/' + item.path"
-                        :key="item.id"
-                        @click="saveNavState('/' + item.path)">
-
-            <!-- 图标 -->
-            <i :class="item.icon"/>
-            <!-- 文本 -->
-            <span slot="title">{{item.authName}}</span>
-
-          </el-menu-item>
-        </el-menu>
       </el-aside>
 
       <!-- 右边栏 -->
@@ -153,21 +127,6 @@
         }
       };
       return {
-        //教师的菜单
-        teacherMenuList: [
-          {
-            id: 1,
-            authName: "我的课程",
-            icon: "iconfont iconwodekecheng",
-            path: "tcourse"
-          },
-          {
-            id: 2,
-            authName: "教学材料管理",
-            icon: "iconfont iconsuoyou",
-            path: "materials",
-          }
-        ],
 
         //修改密码对话框的 显示与隐藏
         updateDialogVisible: false,
@@ -221,22 +180,11 @@
     },
 
     created() {
-      this.loadMenuList();
-      if(window.sessionStorage.getItem("activePath")) {
-        this.activePath = window.sessionStorage.getItem("activePath");
-      }
 
       this.name = window.sessionStorage.getItem("name");
     },
 
     methods: {
-      //根据角色加载菜单列表
-      loadMenuList() {
-        const role = window.sessionStorage.getItem("role");
-        if (parseInt(role) === 3) {
-          this.menulist = this.teacherMenuList;
-        }
-      },
 
       //退出方法
       async logout() {
@@ -299,11 +247,6 @@
         this.isCollapse = !this.isCollapse;
       },
 
-      //保存链接的激活状态
-      saveNavState(activePath) {
-        window.sessionStorage.setItem("activePath", activePath);
-        this.activePath = activePath;
-      }
     }
   }
 </script>

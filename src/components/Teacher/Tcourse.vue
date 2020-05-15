@@ -2,7 +2,6 @@
   <div>
     <!-- 面包屑导航区域 -->
     <el-breadcrumb separator-class="el-icon-arrow-right">
-      <el-breadcrumb-item>首页</el-breadcrumb-item>
       <el-breadcrumb-item>我的课程</el-breadcrumb-item>
     </el-breadcrumb>
     <!-- 面包屑导航区域结束 -->
@@ -48,7 +47,7 @@
                       type="primary"
                       icon="el-icon-circle-check"
                       size="mini"
-                      @click=""
+                      @click="openMaterial(scope.row.id,scope.row.name)"
               />
             </el-tooltip>
           </template>
@@ -119,6 +118,12 @@
         this.pagenum = newPage; //页码值改变
         this.getCourseList();
       },
+
+      openMaterial(id,name) {
+        window.sessionStorage.setItem("cid",id);
+        window.sessionStorage.setItem("cname",name);
+        this.$router.push("/materials");
+      }
     }
 
   }
