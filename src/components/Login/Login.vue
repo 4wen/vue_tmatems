@@ -1,7 +1,7 @@
 <template>
   <div class="login_container">
     <div class="login_box">
-      <div class="title">教学评估材料管理系统</div>
+      <div class="title">高校教学及评估管理系统</div>
       <!-- 登录表单开始 -->
       <el-tabs v-model="activeName" @tab-click="handleClick" class="tabs">
         <el-tab-pane label="学生" name="first">
@@ -212,6 +212,12 @@
             {
               pattern: /^[\u4E00-\u9FA5]+$/,
               message: "姓名只能为中文"
+            },
+            {
+              min: 2,
+              max: 4,
+              message: "姓名长度在2~4个汉字之间",
+              trigger: "blur"
             }
           ],
           username: [
@@ -382,7 +388,7 @@
     text-align: center;
     font-size: 30px;
     padding: 0 15px;
-    margin: 10px 0 20px 0;
+    margin: 20px 0 20px 0;
   }
 
   .el-tabsitem {

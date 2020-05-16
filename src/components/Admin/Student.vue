@@ -112,7 +112,7 @@
             <!-- 重置密码按钮 -->
             <el-tooltip effect="dark" content="重置密码" placement="top" :enterable="false">
               <el-button
-                      type="danger"
+                      type="info"
                       icon="el-icon-setting"
                       size="mini"
                       @click="resetPassword(scope.row.id,scope.row.name)"
