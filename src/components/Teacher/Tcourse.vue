@@ -12,10 +12,14 @@
         <el-table-column type="expand">
           <template slot-scope="props">
             <span>学生的建议与意见:</span>
-            <ul class="infinite-list"  style="overflow:auto">
-              <li v-if="props.row.suggest.length == 0" class="infinite-list-item">暂无</li>
-              <li v-for="i in props.row.suggest" class="infinite-list-item">{{ i }}</li>
-            </ul>
+<!--            <ul class="infinite-list"  style="overflow:auto">-->
+<!--              <li v-if="props.row.suggest.length === 0" class="infinite-list-item">暂无</li>-->
+<!--              <li v-for="i in props.row.suggest" class="infinite-list-item">{{ i }}</li>-->
+<!--            </ul>-->
+
+            <div class="comment-body"  v-for="i in props.row.suggest">
+              <p class="comment">{{i}}</p>
+            </div>
 
           </template>
         </el-table-column>
@@ -138,5 +142,19 @@
     background: #e8f3fe;
     margin: 10px;
     color: #000000;
+  }
+
+  .comment-body {
+    width: 600px;
+    margin: auto;
+    margin-bottom: 5px;
+    border: 0.5px solid #CAE1FF;
+    border-radius:10px;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2), 0 3px 5px 0 rgba(0, 0, 0, 0.19);
+
+  }
+
+  .comment{
+    padding-left: 5px;
   }
 </style>

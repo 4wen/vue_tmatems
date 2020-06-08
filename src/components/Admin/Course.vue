@@ -83,6 +83,7 @@
           </template>
         </el-table-column>
         <el-table-column label="任课教师" prop="teacherName" align='center'/>
+        <el-table-column label="已选课人数" prop="number" align='center'/>
         <el-table-column label="课程描述" prop="remark" :show-overflow-tooltip="true" width="400" align='center'/>
         <el-table-column label="课堂评论" prop="isok" align='center'>
           <template slot-scope="scope">

@@ -13,6 +13,34 @@
       <el-table
               :data="materialList"
               style="width: 100%">
+        <el-table-column type="expand">
+          <template slot-scope="props">
+
+            <div class="comment-head">
+              <el-input
+                      placeholder="请输入评论。。。"
+                      v-model="comment"
+                      clearable>
+              </el-input>
+              <div class="comment-btn">
+                <el-button
+                        type="primary"
+                        @click="addMcomment(props.row.id)">提交
+                </el-button>
+              </div>
+            </div>
+
+            <div class="comment-body" v-for="i in props.row.mcommentList">
+              <p class="author">{{i.name}}</p>
+              <p class="comment">{{i.content}}</p>
+              <p class="time">
+                <span class="data">评论时间:</span>
+                {{i.time}}
+              </p>
+            </div>
+
+          </template>
+        </el-table-column>
         <el-table-column type="index" label="#" align='center'/>
         <el-table-column
                 label="文件"
@@ -22,6 +50,11 @@
         <el-table-column
                 label="上传时间"
                 prop="time"
+                align='center'>
+        </el-table-column>
+        <el-table-column
+                label="已下载人数"
+                prop="number"
                 align='center'>
         </el-table-column>
         <el-table-column
@@ -74,6 +107,7 @@
 
         total: 0,
 
+        comment: "",
       }
     },
 
@@ -116,14 +150,72 @@
 
       //下载教学材料
       fileDownload(url) {
-        window.open("http://192.168.89.131/"+url);
-      }
+        window.open("http://192.168.89.131/" + url);
+      },
 
+      //添加教学材料评论
+      async addMcomment(mid) {
+        if (this.comment === "") {
+          return this.$message.error("输入评论不能为空！");
+        }
+        const {data: res} = await this.$http.post("mcomment", {
+          uid: this.$store.state.user.id,
+          mid: mid,
+          content: this.comment
+        });
+
+        if (res.code !== 200) {
+          //输入框重置
+          this.comment = "";
+          return this.$message.error("添加失败");
+
+        } else {
+          //输入框重置
+          this.comment = "";
+          return this.$message.success("添加成功");
+        }
+      }
     }
 
   }
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 
+  .comment-head {
+    text-align: right;
+    border: 0.5px solid #CAE1FF;
+    border-radius: 10px;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.19);
+    padding: 5px;
+    margin-bottom: 20px;
+  }
+
+  .comment-btn {
+    margin: 5px auto 0px auto;
+  }
+
+
+  .comment-body {
+    margin-top: 5px;
+    border: 0.5px solid #CAE1FF;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2), 0 3px 5px 0 rgba(0, 0, 0, 0.19);
+  }
+
+  .author {
+    padding-left: 5px;
+    color: #6CA6CD;
+    font-size: 16px;
+  }
+
+  .comment {
+    padding-left: 25px;
+  }
+
+  .time {
+    padding-left: 5px;
+    font-size: 12px;
+    color: #9FB6CD;
+  }
 </style>

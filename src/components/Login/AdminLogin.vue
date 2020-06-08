@@ -65,11 +65,9 @@ export default {
           "admin/login",
           this.loginFrom
         );
-
         //登录失败返回
         if (res.code !== 200)
           return this.$message.error("登录失败! " + res.msg);
-
         //先清空sessionStorage
         window.sessionStorage.clear();
         //登录成功 token存入sessionStorage
@@ -81,7 +79,6 @@ export default {
         window.sessionStorage.setItem("role", decode.role);
         window.sessionStorage.setItem("name",decode.admin.name);
         window.sessionStorage.setItem("college",decode.admin.college);
-
         this.$message.success(res.msg);
         // 通过编程式导航跳转到后台主页，路由地址是 /home
         this.$router.push("/home");

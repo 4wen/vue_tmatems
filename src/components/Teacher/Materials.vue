@@ -22,6 +22,14 @@
               style="width: 100%">
         <el-table-column type="expand">
           <template slot-scope="props">
+            <div class="comment-body" v-for="i in props.row.mcommentList">
+              <p class="author">{{i.name}}</p>
+              <p class="comment">{{i.content}}</p>
+              <p class="time">
+                <span class="data">评论时间:</span>
+                {{i.time}}
+              </p>
+            </div>
 
           </template>
         </el-table-column>
@@ -34,6 +42,11 @@
         <el-table-column
                 label="上传时间"
                 prop="time"
+                align='center'>
+        </el-table-column>
+        <el-table-column
+                label="已下载人数"
+                prop="number"
                 align='center'>
         </el-table-column>
         <el-table-column
@@ -100,12 +113,13 @@
                   :http-request="uploadFile"
                   :auto-upload="false">
             <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
-            <el-button style="margin-left: 10px;" size="small" type="success" @click="submitUpload">上传到服务器</el-button>
+            <el-button style="margin-left: 10px;"
+                       size="small" type="success"
+                       @click="submitUpload">上传到服务器</el-button>
             <div slot="tip" class="el-upload__tip">一次只能上传1个文件，且不超过50Mb</div>
           </el-upload>
         </el-form-item>
       </el-form>
-
       <!-- 底部 -->
       <span slot="footer" class="dialog-footer">
         <el-button @click="addDialogVisible = false">取 消</el-button>
@@ -203,7 +217,6 @@
       submitUpload() {
         this.$refs.upload.submit();
       },
-
       // 文件上传
       async uploadFile(params) {
         const _file = params.file;
@@ -220,8 +233,6 @@
         } else {
           this.$message.error(res.msg);
         }
-
-
       },
 
 
@@ -277,6 +288,27 @@
   }
 </script>
 
-<style scoped>
+<style lang="less" scoped>
+  .comment-body {
+    margin-top: 5px;
+    border: 0.5px solid #CAE1FF;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2), 0 3px 5px 0 rgba(0, 0, 0, 0.19);
+  }
 
+  .author {
+    padding-left: 5px;
+    color: #6CA6CD;
+    font-size: 16px;
+  }
+
+  .comment {
+    padding-left: 25px;
+  }
+
+  .time {
+    padding-left: 5px;
+    font-size: 12px;
+    color: #9FB6CD;
+  }
 </style>

@@ -31,19 +31,16 @@ import axios from 'axios'
 axios.defaults.baseURL = 'http://localhost:8090/';
 //请求拦截，带上token去请求后台接口
 axios.interceptors.request.use(config => {
-  
   if (!config.url.includes("/registered/")
     && !config.url.includes("/loadAllCollege")
     && !config.url.includes("/loadAllClasses/")) {
-      //注册时候不要Loading,个人不喜欢
+      //注册时候不要Loading
       startLoading();
   }
-  
   //请求头对象，添加 Authorization 字段
   config.headers.Authorization = window.sessionStorage.getItem('token');
   return config
 });
-
 //响应拦截
 axios.interceptors.response.use(response => {
   //console.log(response);
@@ -58,14 +55,13 @@ axios.interceptors.response.use(response => {
     router.push('login')
   }
   return response
-
 },error => {
   endLoading();
   Message.error("服务器响应失败，联系管理员");
 
 });
-
-Vue.prototype.$http = axios; //全局挂载axios
+//全局挂载axios
+Vue.prototype.$http = axios;
 
 Vue.config.productionTip = false;
 
